@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.example.rentmycar.components.BottomNavBar
 import com.example.rentmycar.navigation.AppNavigation
@@ -19,10 +20,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             RentMyCarTheme {
                 val navController = rememberNavController()
+                val context = LocalContext.current
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = { BottomNavBar(navController) }) { innerPadding ->
-                    AppNavigation(navController = navController)
+                    AppNavigation(navController = navController, context)
                 }
             }
         }
