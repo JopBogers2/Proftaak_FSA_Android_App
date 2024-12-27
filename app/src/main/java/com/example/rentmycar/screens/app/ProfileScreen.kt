@@ -1,4 +1,4 @@
-package com.example.rentmycar.screens.home
+package com.example.rentmycar.screens.app
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
