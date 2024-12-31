@@ -32,10 +32,29 @@ class ProfileViewModel @Inject constructor(
     fun loadUserData() {
         viewModelScope.launch {
             try {
-                val response = apiCallHandler.makeApiCall { apiService.getUserScore() }
+                _viewState.update { ProfileViewState.Loading }
+                val response = apiCallHandler.makeApiCall { apiService.getUser() }
                 _viewState.update { ProfileViewState.Success(response) }
             } catch (e: ApiException) {
-                _viewState.update { ProfileViewState.Error(e.message)}
+                _viewState.update { ProfileViewState.Error(e.message) }
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            apiCallHandler.handleLogout()
+        }
+    }
+
+    fun deleteUser() {
+        viewModelScope.launch {
+            try {
+                _viewState.update { ProfileViewState.Loading }
+                val response = apiCallHandler.makeApiCall { apiService.deleteUser() }
+                apiCallHandler.handleLogout()
+            } catch (e: ApiException) {
+                _viewState.update { ProfileViewState.Error(e.message) }
             }
         }
     }
