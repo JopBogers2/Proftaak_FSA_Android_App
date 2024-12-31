@@ -13,30 +13,37 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.PreferencesManager
+import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.AuthViewModel
-import com.example.rentmycar.viewmodel.AuthViewModelFactory
+import com.example.rentmycar.viewmodel.AuthViewState
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
-    val viewModel: AuthViewModel =
-        viewModel(factory = AuthViewModelFactory(PreferencesManager(LocalContext.current)))
+fun LoginScreen(navController: NavHostController, viewModel: AuthViewModel = hiltViewModel()) {
+    val viewState by viewModel.viewState.collectAsState()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
 
     val isFormValid = email.isNotEmpty() && password.isNotEmpty()
+
+    LaunchedEffect(viewState) {
+        when (viewState) {
+            is AuthViewState.Success -> navController.navigate(BottomNavItem.Home.route)
+            else -> {}
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -71,36 +78,34 @@ fun LoginScreen(navController: NavHostController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = {
-                isLoading = true
-                viewModel.login(email, password, {
-                    isLoading = false
-                    navController.navigate("home")
-                }, { error ->
-                    isLoading = false
-                    errorMessage = error
-                })
-            },
+            onClick = { viewModel.login(email, password) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = isFormValid && !isLoading
+            enabled = isFormValid && viewState != AuthViewState.Loading
         ) {
-            if (isLoading) {
+            if (viewState == AuthViewState.Loading) {
                 androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(20.dp))
             } else {
                 Text("Login")
             }
         }
-        if (errorMessage.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = errorMessage, color = androidx.compose.ui.graphics.Color.Red)
+
+        when (val state = viewState) {
+            is AuthViewState.Error -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = state.message, color = Color.Red)
+            }
+            else -> {}
         }
+
+
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Don't have an account? Register here.",
-            color = androidx.compose.ui.graphics.Color.Blue,
+            color = Color.Blue,
             modifier = Modifier
                 .clickable { navController.navigate("register") }
                 .padding(8.dp)
         )
     }
+
 }

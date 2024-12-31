@@ -13,31 +13,38 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.PreferencesManager
+import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.AuthViewModel
-import com.example.rentmycar.viewmodel.AuthViewModelFactory
+import com.example.rentmycar.viewmodel.AuthViewState
 
 @Composable
-fun RegisterScreen(navController: NavHostController) {
-    val viewModel: AuthViewModel =
-        viewModel(factory = AuthViewModelFactory(PreferencesManager(LocalContext.current)))
+fun RegisterScreen(navController: NavHostController, viewModel: AuthViewModel = hiltViewModel()) {
+
+    val viewState by viewModel.viewState.collectAsState()
+
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(viewState) {
+        when (viewState) {
+            is AuthViewState.Success -> navController.navigate(BottomNavItem.Home.route)
+            else -> {}
+        }
+    }
 
     val isFormValid = firstName.isNotEmpty() &&
             lastName.isNotEmpty() &&
@@ -99,30 +106,23 @@ fun RegisterScreen(navController: NavHostController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = {
-                isLoading = true
-                viewModel.register(
-                    firstName, lastName, username, email, password, {
-                        isLoading = false
-                        navController.navigate("home")
-                    }, { error ->
-                        isLoading = false
-                        errorMessage = error
-                    }
-                )
-            },
+            onClick = { viewModel.register(firstName, lastName, username, email, password) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = isFormValid && !isLoading // Disable the button if loading or form is invalid
+            enabled = isFormValid && viewState != AuthViewState.Loading
         ) {
-            if (isLoading) {
+            if (viewState == AuthViewState.Loading) {
                 androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(20.dp))
             } else {
                 Text("Register")
             }
         }
-        if (errorMessage.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = errorMessage, color = androidx.compose.ui.graphics.Color.Red)
+        when (val state = viewState) {
+            is AuthViewState.Error -> {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = state.message, color = androidx.compose.ui.graphics.Color.Red)
+            }
+
+            else -> {}
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
