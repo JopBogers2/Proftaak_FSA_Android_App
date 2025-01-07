@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.navigation.AppNavItem
 import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.AuthViewModel
 import com.example.rentmycar.viewmodel.AuthViewState
@@ -129,7 +130,7 @@ fun RegisterScreen(navController: NavHostController, viewModel: AuthViewModel = 
             text = "Already have an account? Login here.",
             color = androidx.compose.ui.graphics.Color.Blue,
             modifier = Modifier
-                .clickable { navController.navigate("login") }
+                .clickable { navController.navigate(AppNavItem.Login.route) }
                 .padding(8.dp)
         )
     }

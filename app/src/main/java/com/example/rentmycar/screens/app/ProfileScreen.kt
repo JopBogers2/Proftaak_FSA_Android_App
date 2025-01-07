@@ -47,8 +47,13 @@ fun ProfileScreen(navController: NavHostController, viewModel: ProfileViewModel 
                 .padding(24.dp, 36.dp)
         ) {
             when (val state = viewState) {
+
                 ProfileViewState.Loading -> CenteredContent {
                     CircularProgressIndicator()
+                }
+
+                ProfileViewState.Updated -> {
+                    viewModel.loadUserData()
                 }
 
                 is ProfileViewState.Error -> CenteredContent {
@@ -106,7 +111,9 @@ fun ProfileView(user: UserResponse, viewModel: ProfileViewModel, navController: 
         Spacer(modifier = Modifier.height(85.dp))
         Button(
             modifier = Modifier.width(220.dp),
-            onClick = { navController.navigate("edit-profile") }) {
+            onClick = {
+                navController.navigate("edit-profile")
+            }) {
             Text(text = "Edit Profile")
         }
         Spacer(modifier = Modifier.height(16.dp))

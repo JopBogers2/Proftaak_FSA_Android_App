@@ -9,6 +9,7 @@ import com.example.rentmycar.screens.app.HomeScreen
 import com.example.rentmycar.screens.app.ProfileScreen
 import com.example.rentmycar.screens.app.SettingsScreen
 import com.example.rentmycar.PreferencesManager
+import com.example.rentmycar.screens.app.EditProfileScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
 
@@ -17,11 +18,12 @@ import com.example.rentmycar.screens.auth.RegisterScreen
 fun AppNavigation(navController: NavHostController, context: Context) {
     val startDestination = getStartDestination(context)
     NavHost(navController = navController, startDestination = startDestination) {
+        composable(AppNavItem.Login.route) { LoginScreen(navController) }
+        composable(AppNavItem.Register.route) { RegisterScreen(navController) }
         composable(BottomNavItem.Home.route) { HomeScreen(navController) }
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
+        composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
         composable(BottomNavItem.Settings.route) { SettingsScreen(navController) }
-        composable("login") { LoginScreen(navController) }
-        composable("register") { RegisterScreen(navController) }
     }
 }
 
@@ -30,5 +32,5 @@ fun getStartDestination(context: Context): String {
     if (token != null) {
         return BottomNavItem.Home.route
     }
-    return "login"
+    return AppNavItem.Login.route
 }
