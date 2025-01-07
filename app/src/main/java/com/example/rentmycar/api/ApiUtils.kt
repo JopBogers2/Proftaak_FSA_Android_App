@@ -27,7 +27,7 @@ class ApiCallHandler @Inject constructor(
         }
     }
 
-    private suspend fun handleLogout() {
+    suspend fun handleLogout() {
         preferencesManager.clearToken()
         _logoutEvent.emit(Unit)
     }

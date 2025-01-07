@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.navigation.AppNavItem
 import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.AuthViewModel
 import com.example.rentmycar.viewmodel.AuthViewState
@@ -97,13 +98,12 @@ fun LoginScreen(navController: NavHostController, viewModel: AuthViewModel = hil
             else -> {}
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Don't have an account? Register here.",
             color = Color.Blue,
             modifier = Modifier
-                .clickable { navController.navigate("register") }
+                .clickable { navController.navigate(AppNavItem.Register.route) }
                 .padding(8.dp)
         )
     }
