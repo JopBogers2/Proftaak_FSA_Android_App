@@ -2,6 +2,7 @@ package com.example.rentmycar.api
 
 import com.example.rentmycar.api.requests.BrandDTO
 import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.requests.LocationRequest
 import com.example.rentmycar.api.requests.LoginRequest
 import com.example.rentmycar.api.requests.MessageResponse
 import com.example.rentmycar.api.requests.ModelDTO
@@ -10,6 +11,7 @@ import com.example.rentmycar.api.requests.RegisterRequest
 import com.example.rentmycar.api.requests.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.api.responses.AuthResponse
+import com.example.rentmycar.api.responses.LocationResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -43,6 +45,15 @@ interface ApiService {
 
     @GET("model/brand/{brandId}")
     suspend fun getModelsByBrand(@Path("brandId") brandId: Int): Response<List<ModelDTO>>
+
+ @POST("car/location")
+    suspend fun addCarLocation(@Body request: LocationRequest): Response<Unit>
+
+    @PUT("car/location")
+    suspend fun updateCarLocation(@Body request: LocationRequest): Response<Unit>
+
+    @GET("car/{carId}/location")
+    suspend fun getCarLocation(@Path("carId") carId: Int): Response<LocationResponse>
 
     @POST("car/register")
     suspend fun registerCar(@Body request: RegisterCarRequest): Response<ResponseBody>

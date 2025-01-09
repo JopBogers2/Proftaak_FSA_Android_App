@@ -14,9 +14,34 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.viewmodel.MyCarViewModel
 import com.example.rentmycar.api.requests.BrandDTO
+
+
 import com.example.rentmycar.api.requests.ModelDTO
 import com.example.rentmycar.viewmodel.DataLoadingState
 import com.example.rentmycar.viewmodel.RegistrationState
+
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.location.LocationRequest
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.core.content.ContextCompat
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+
+import com.example.rentmycar.api.requests.LocationRequest as CustomLocationRequest
+import com.google.android.gms.location.LocationRequest as GmsLocationRequest
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +58,12 @@ fun AddCarScreen(
     val selectedBrand by viewModel.selectedBrand.collectAsState(initial = null)
     val selectedModel by viewModel.selectedModel.collectAsState(initial = null)
 
+
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+
+
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var fieldErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var isCarAdded by remember { mutableStateOf(false) }
@@ -47,34 +78,66 @@ fun AddCarScreen(
     var expandedTransmission by remember { mutableStateOf(false) }
     var expandedFuelType by remember { mutableStateOf(false) }
 
+    var currentLocation by remember { mutableStateOf<Location?>(null) }
+    var locationText by remember { mutableStateOf<String?>(null) }
+    var location by remember { mutableStateOf<Location?>(null) }
     val transmissionOptions = listOf("AUTOMATIC", "MANUAL")
     val fuelTypeOptions = listOf("DIESEL", "PETROL", "GAS", "ELECTRIC", "HYDROGEN")
 
-    LaunchedEffect(registrationState) {
-        when (registrationState) {
-            is RegistrationState.Success -> {
-                isCarAdded = true
-                // Clear form fields
-                licensePlate = ""
-                year = ""
-                color = ""
-                price = ""
-                selectedTransmission = null
-                selectedFuelType = null
-                viewModel.selectBrand(-1)
-                viewModel.selectModel(-1)
-                // Show success message
-                errorMessage = "Car added successfully!"
-            }
-            is RegistrationState.Error -> {
-                errorMessage = (registrationState as RegistrationState.Error).message
-                fieldErrors = (registrationState as RegistrationState.Error).fieldErrors
-            }
-            else -> {
-                // Handle other states if needed
-            }
+     var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        hasLocationPermission = isGranted
+    }
+
+LaunchedEffect(registrationState) {
+    Log.d("AddCarScreen", "Registration state changed: $registrationState")
+    when (registrationState) {
+        is RegistrationState.Success -> {
+            Log.d("AddCarScreen", "Car added successfully")
+            isCarAdded = true
+            // Clear form fields
+            licensePlate = ""
+            year = ""
+            color = ""
+            price = ""
+            selectedTransmission = null
+            selectedFuelType = null
+            viewModel.selectBrand(-1)
+            viewModel.selectModel(-1)
+            // Show success message
+            errorMessage = "Car added successfully!"
+        }
+        is RegistrationState.Error -> {
+            Log.e("AddCarScreen", "Error adding car: ${(registrationState as RegistrationState.Error).message}")
+            errorMessage = (registrationState as RegistrationState.Error).message
+            fieldErrors = (registrationState as RegistrationState.Error).fieldErrors
+        }
+        is RegistrationState.Loading -> {
+            Log.d("AddCarScreen", "Car registration in progress")
+        }
+        else -> {
+            Log.d("AddCarScreen", "Unknown registration state: $registrationState")
         }
     }
+}
+
+
+    LaunchedEffect(hasLocationPermission) {
+        if (!hasLocationPermission) {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         viewModel.fetchBrands()
@@ -104,6 +167,25 @@ fun AddCarScreen(
                 CircularProgressIndicator()
             }
             is DataLoadingState.Success -> {
+
+
+                 LocationSection(
+                    hasLocationPermission = hasLocationPermission,
+                    onFetchLocation = {
+                        coroutineScope.launch {
+                            currentLocation = getCurrentLocation(context)
+                            locationText = if (currentLocation != null) {
+                                "Location fetched: ${currentLocation!!.latitude}, ${currentLocation!!.longitude}"
+                            } else {
+                                "Failed to fetch location"
+                            }
+                        }
+                    },
+                    locationText = locationText
+                )
+
+
+
                 // Brand dropdown
                 ExposedDropdownMenuBox(
                     expanded = expandedBrand,
@@ -258,23 +340,60 @@ fun AddCarScreen(
                     }
                 }
 
-                Button(
-                    onClick = {
-                        val request = RegisterCarRequest(
-                            modelId = selectedModelId ?: 0,
-                            licensePlate = licensePlate,
-                            year = year.toIntOrNull() ?: 0,
-                            color = color,
-                            transmission = selectedTransmission ?: "",
-                            fuel = selectedFuelType ?: "",
-                            price = price.toDoubleOrNull() ?: 0.0
+
+
+Button(
+    onClick = {
+        coroutineScope.launch {
+            val carRequest = RegisterCarRequest(
+                licensePlate = licensePlate,
+                modelId = selectedModelId ?: 0,
+                fuel = selectedFuelType ?: "",
+                year = year.toIntOrNull() ?: 0,
+                color = color,
+                transmission = selectedTransmission ?: "",
+                price = price.toDoubleOrNull() ?: 0.0
+            )
+
+            viewModel.registerCar(carRequest) { carId ->
+                if (carId != null) {
+                    // Car registration successful
+                    if (currentLocation != null) {
+                        // If we have location data, send a separate request to add the location
+                        val locationRequest = CustomLocationRequest(
+                            carId = carId,
+                            latitude = currentLocation!!.latitude,
+                            longitude = currentLocation!!.longitude
                         )
-                        viewModel.registerCar(request)
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                ) {
-                    Text("Add Car")
+                        viewModel.addLocation(locationRequest)
+                    } else {
+                        // Try to fetch location if not available
+                        coroutineScope.launch {
+                            currentLocation = getCurrentLocation(context)
+                            if (currentLocation != null) {
+                                val locationRequest = CustomLocationRequest(
+                                    carId = carId,
+                                    latitude = currentLocation!!.latitude,
+                                    longitude = currentLocation!!.longitude
+                                )
+                                viewModel.addLocation(locationRequest)
+                            } else {
+                                // Car registered successfully without location
+                                errorMessage = "Car registered successfully, but no location was set!"
+                            }
+                        }
+                    }
+                } else {
+                    // Car registration failed
+                    errorMessage = "Failed to register car"
                 }
+            }
+        }
+    },
+    modifier = Modifier.align(Alignment.CenterHorizontally)
+) {
+    Text("Add Car")
+}
 
                 if (isCarAdded) {
                     Text(
@@ -300,6 +419,60 @@ fun AddCarScreen(
         if (registrationState is RegistrationState.Loading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
+    }
+}
+
+
+
+@Composable
+fun LocationSection(
+    hasLocationPermission: Boolean,
+    onFetchLocation: () -> Unit,
+    locationText: String?
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Button(
+            onClick = onFetchLocation,
+            enabled = hasLocationPermission,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Fetch Current Location")
+        }
+        if (locationText != null) {
+            Text(
+                text = locationText,
+                color = Color.Blue,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+
+
+
+suspend fun getCurrentLocation(context: Context): Location? {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return null
+    }
+
+    return try {
+        fusedLocationClient.getCurrentLocation(GmsLocationRequest.PRIORITY_HIGH_ACCURACY, null).await()
+    } catch (e: Exception) {
+        null
     }
 }
 

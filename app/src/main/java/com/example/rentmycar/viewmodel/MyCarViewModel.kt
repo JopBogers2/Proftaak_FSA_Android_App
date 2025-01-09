@@ -1,5 +1,6 @@
 package com.example.rentmycar.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +8,9 @@ import com.example.rentmycar.api.ApiService
 import com.example.rentmycar.api.requests.CarResponse
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.api.requests.BrandDTO
+import com.example.rentmycar.api.requests.LocationRequest
 import com.example.rentmycar.api.requests.ModelDTO
+import com.example.rentmycar.api.responses.LocationResponse
 import com.example.rentmycar.repository.CarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,11 +21,15 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
+import com.example.rentmycar.api.requests.LocationRequest as CustomLocationRequest
+
 @HiltViewModel
 class MyCarViewModel @Inject constructor(
     private val apiService: ApiService,
     private val carRepository: CarRepository
 ) : ViewModel() {
+
+
 
     private val _registrationState = MutableStateFlow<RegistrationState>(RegistrationState.Idle)
     val registrationState: StateFlow<RegistrationState> = _registrationState
@@ -58,49 +65,6 @@ class MyCarViewModel @Inject constructor(
 
 
 
-/*    fun getUserCars() {
-        viewModelScope.launch {
-            _viewState.value = MyCarViewState.Loading
-            try {
-                val response = apiService.getUserCars()
-                when {
-                    response.isSuccessful -> {
-                        val cars = response.body() ?: emptyList()
-                        if (cars.isEmpty()) {
-                            _viewState.value = MyCarViewState.NoCars
-                        } else {
-                            _viewState.value = MyCarViewState.Success(cars)
-                        }
-                    }
-                    response.code() == 404 -> {
-                        _viewState.value = MyCarViewState.NoCars
-                    }
-                    else -> {
-                        _viewState.value = MyCarViewState.Error("Failed to fetch cars: ${response.message()}")
-                    }
-                }
-            } catch (e: Exception) {
-                _viewState.value = MyCarViewState.Error("Failed to fetch cars: ${e.message}")
-            }
-        }
-    }*/
-
-/*
-    fun getCarById(carId: Int) {
-        viewModelScope.launch {
-            try {
-                val response = apiService.getCarDetails(carId)
-                if (response.isSuccessful) {
-                    _viewState.value = MyCarViewState.Success(listOf(response.body()!!))
-                } else {
-                    _viewState.value = MyCarViewState.Error("Failed to fetch car details")
-                }
-            } catch (e: Exception) {
-                _viewState.value = MyCarViewState.Error(e.message ?: "An error occurred")
-            }
-        }
-    }
-*/
 
 
     init {
@@ -146,24 +110,55 @@ class MyCarViewModel @Inject constructor(
 
 
 
-    fun registerCar(request: RegisterCarRequest) {
+  fun registerCar(request: RegisterCarRequest, onComplete: (Int?) -> Unit) {
         viewModelScope.launch {
             _registrationState.value = RegistrationState.Loading
             try {
                 val result = carRepository.registerCar(request)
                 result.fold(
+                    onSuccess = { response ->
+                        _registrationState.value = RegistrationState.Success(response)
+                        // Assuming the response is the car ID as a string
+                        onComplete(response.toIntOrNull())
+                    },
+                    onFailure = { error ->
+                        _registrationState.value = RegistrationState.Error("Failed to register car: ${error.message}", parseFieldErrors(error.message ?: ""))
+                        onComplete(null)
+                    }
+                )
+            } catch (e: Exception) {
+                _registrationState.value = RegistrationState.Error("Unexpected error: ${e.message}", emptyMap())
+                onComplete(null)
+            }
+        }
+    }
+
+
+    fun addLocation(locationRequest: CustomLocationRequest) {
+        viewModelScope.launch {
+            try {
+                val result = carRepository.addCarLocation(
+                    locationRequest.carId,
+                    locationRequest.latitude,
+                    locationRequest.longitude
+                )
+                result.fold(
                     onSuccess = { message ->
                         _registrationState.value = RegistrationState.Success(message)
                     },
                     onFailure = { error ->
-                        _registrationState.value = RegistrationState.Error("Failed to register car: ${error.message}")
+                        _registrationState.value = RegistrationState.Error("Failed to add location: ${error.message}", emptyMap())
                     }
                 )
             } catch (e: Exception) {
-                _registrationState.value = RegistrationState.Error("An error occurred: ${e.message}")
+                _registrationState.value = RegistrationState.Error("Network error: ${e.message}", emptyMap())
             }
         }
     }
+
+
+
+
 
     private fun parseFieldErrors(errorMessage: String): Map<String, String> {
         val fieldErrors = mutableMapOf<String, String>()

@@ -8,5 +8,6 @@ data class RegisterCarRequest(
     val color: String,
     val transmission: String,
     val price: Double,
-    val image: ByteArray? = null
+    val image: ByteArray? = null,
+
 )

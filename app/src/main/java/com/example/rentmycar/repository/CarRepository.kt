@@ -6,6 +6,8 @@ package com.example.rentmycar.repository
     import com.example.rentmycar.api.requests.RegisterCarRequest
     import com.example.rentmycar.api.requests.ModelDTO
     import com.example.rentmycar.api.requests.BrandDTO
+    import com.example.rentmycar.api.requests.LocationRequest
+    import com.example.rentmycar.api.responses.LocationResponse
     import com.squareup.moshi.Moshi
     import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
     import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -22,23 +24,63 @@ package com.example.rentmycar.repository
             .add(KotlinJsonAdapterFactory())
             .build()
 
-        suspend fun registerCar(request: RegisterCarRequest): Result<String> {
-            return try {
-                val response = apiService.registerCar(request)
-                if (response.isSuccessful) {
-                    val responseBody = response.body()?.string() ?: "Car registered successfully"
-                    Result.success(responseBody)
-                } else {
-                    val errorBody = response.errorBody()?.string() ?: "Unknown error"
-                    Result.failure(Exception("Failed to register car: $errorBody"))
-                }
-            } catch (e: IOException) {
-                Result.failure(Exception("Network error: ${e.message}", e))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+suspend fun registerCar(request: RegisterCarRequest): Result<String> {
+    return try {
+        val response = apiService.registerCar(request)
+        if (response.isSuccessful) {
+            val responseBody = response.body()?.string() ?: "Car registered successfully"
+            Result.success(responseBody)
+        } else {
+            val errorBody = response.errorBody()?.string() ?: "Unknown error"
+            Result.failure(Exception("Failed to register car: $errorBody"))
         }
+    } catch (e: IOException) {
+        Result.failure(Exception("Network error: ${e.message}", e))
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}
 
+    suspend fun addCarLocation(carId: Int, latitude: Double, longitude: Double): Result<String> {
+        return try {
+            val request = LocationRequest(carId, latitude, longitude)
+            val response = apiService.addCarLocation(request)
+            if (response.isSuccessful) {
+                Result.success("Location added successfully")
+            } else {
+                Result.failure(Exception("Failed to add location: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateCarLocation(carId: Int, latitude: Double, longitude: Double): Result<String> {
+        return try {
+            val request = LocationRequest(carId, latitude, longitude)
+            val response = apiService.updateCarLocation(request)
+            if (response.isSuccessful) {
+                Result.success("Location updated successfully")
+            } else {
+                Result.failure(Exception("Failed to update location: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getCarLocation(carId: Int): Result<LocationResponse> {
+        return try {
+            val response = apiService.getCarLocation(carId)
+            if (response.isSuccessful) {
+                Result.success(response.body()!!)
+            } else {
+                Result.failure(Exception("Failed to get location: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     suspend fun getBrands(): List<BrandDTO>? {
         return try {
