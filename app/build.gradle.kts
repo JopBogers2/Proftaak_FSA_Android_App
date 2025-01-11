@@ -48,7 +48,13 @@ android {
 
 dependencies {
     implementation(libs.hilt.android)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.converter.moshi)
     implementation(libs.moshi.kotlin)
