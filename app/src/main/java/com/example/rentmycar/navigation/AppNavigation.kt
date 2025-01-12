@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.rentmycar.screens.app.HomeScreen
 import com.example.rentmycar.screens.app.ProfileScreen
-import com.example.rentmycar.screens.app.SettingsScreen
 import com.example.rentmycar.PreferencesManager
 import com.example.rentmycar.screens.app.CarItemScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
@@ -26,7 +25,6 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         composable(BottomNavItem.Home.route) { HomeScreen(navController, context) }
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
         composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
-        composable(BottomNavItem.Settings.route) { SettingsScreen(navController) }
 
         composable(
             "carItem/{carId}",
