@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.api.requests.UserResponse
+import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.viewmodel.ProfileViewModel
 import com.example.rentmycar.viewmodel.ProfileViewState
 

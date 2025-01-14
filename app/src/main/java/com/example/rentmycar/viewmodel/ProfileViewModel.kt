@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.ApiCallHandler
 import com.example.rentmycar.api.ApiService
-import com.example.rentmycar.api.requests.UserResponse
+import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.exceptions.ApiException
 import dagger.hilt.android.lifecycle.HiltViewModel
