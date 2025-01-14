@@ -11,7 +11,9 @@ import com.example.rentmycar.screens.app.HomeScreen
 import com.example.rentmycar.screens.app.ProfileScreen
 import com.example.rentmycar.PreferencesManager
 import com.example.rentmycar.screens.app.CarItemScreen
+import com.example.rentmycar.screens.app.DirectionScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
+import com.example.rentmycar.screens.app.ReservationScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
 
@@ -24,6 +26,7 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         composable(AppNavItem.Register.route) { RegisterScreen(navController) }
         composable(BottomNavItem.Home.route) { HomeScreen(navController, context) }
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
+        composable(BottomNavItem.Reservations.route) { ReservationScreen(navController) }
         composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
 
         composable(
@@ -37,6 +40,19 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         ) { backStackEntry ->
             val carId = backStackEntry.arguments?.getInt("carId") ?: throw Error()
             CarItemScreen(navController, carId)
+        }
+
+        composable(
+            "directions/{carId}",
+            arguments = listOf(
+                navArgument("carId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val carId = backStackEntry.arguments?.getInt("carId") ?: throw Error()
+            DirectionScreen(navController, carId)
         }
     }
 }
