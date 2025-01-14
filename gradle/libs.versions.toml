@@ -1,6 +1,7 @@
 [versions]
 coilCompose = "3.0.4"
 coilNetworkOkhttp = "3.0.4"
+converterKotlinxSerialization = "latest.version"
 hiltAndroidVersion = "2.52"
 hiltNavigationComposeVersion = "1.2.0"
 agp = "8.7.2"
@@ -11,22 +12,25 @@ coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinxDatetime = "0.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 lifecycleViewmodelKtx = "2.5.1"
 moshiKotlin = "1.12.0"
 navigationFragmentKtx = "2.5.3"
-retrofitVersion = "2.9.0"
 navigationCompose = "2.8.4"
 runtimeLivedata = "1.7.6"
 playServicesLocation = "21.3.0"
 playServicesMaps = "19.0.0"
 mapsCompose = "6.4.1"
+squareupConverterKotlinxSerialization = "latest.version"
 
 [libraries]
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version = "2.11.0" }
+converter-kotlinx-serialization-vlatestversion = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version = "2.11.0" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidVersion" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidVersion" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationComposeVersion" }
@@ -49,8 +53,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
-retrofit2-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 squareup-javapoet = { module = "com.squareup:javapoet", version.ref = "javapoetVersion" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }

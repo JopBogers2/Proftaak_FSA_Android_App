@@ -33,8 +33,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.api.requests.CarLocationResponse
-import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.responses.CarLocationResponse
+import com.example.rentmycar.api.responses.CarResponse
 import com.example.rentmycar.components.ExpandableCard
 import com.example.rentmycar.components.ImageCarousel
 import com.example.rentmycar.components.car.SpecificationRow
