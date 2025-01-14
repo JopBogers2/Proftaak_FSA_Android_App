@@ -6,6 +6,7 @@ package com.example.rentmycar.repository
     import com.example.rentmycar.api.requests.RegisterCarRequest
     import com.example.rentmycar.api.requests.ModelDTO
     import com.example.rentmycar.api.requests.BrandDTO
+    import com.example.rentmycar.api.requests.CarDTO
     import com.example.rentmycar.api.requests.LocationRequest
     import com.example.rentmycar.api.responses.LocationResponse
     import com.squareup.moshi.Moshi
@@ -23,6 +24,19 @@ package com.example.rentmycar.repository
         private val moshi = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
             .build()
+
+
+    suspend fun getOwnerCars(): List<CarDTO> {
+        val response = apiService.getOwnerCars()
+        if (response.isSuccessful) {
+            return response.body() ?: emptyList()
+        } else {
+            throw Exception("Failed to fetch owner cars: ${response.errorBody()?.string()}")
+        }
+    }
+
+
+
 
 suspend fun registerCar(request: RegisterCarRequest): Result<String> {
     return try {
@@ -69,18 +83,6 @@ suspend fun registerCar(request: RegisterCarRequest): Result<String> {
         }
     }
 
-    suspend fun getCarLocation(carId: Int): Result<LocationResponse> {
-        return try {
-            val response = apiService.getCarLocation(carId)
-            if (response.isSuccessful) {
-                Result.success(response.body()!!)
-            } else {
-                Result.failure(Exception("Failed to get location: ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
     suspend fun getBrands(): List<BrandDTO>? {
         return try {

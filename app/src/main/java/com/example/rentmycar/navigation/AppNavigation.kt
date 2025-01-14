@@ -13,6 +13,7 @@ import com.example.rentmycar.PreferencesManager
 import com.example.rentmycar.screens.app.AddCarScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
 import com.example.rentmycar.screens.app.MyCarsScreen
+import com.example.rentmycar.screens.app.UserCarsScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
 import com.example.rentmycar.viewmodel.MyCarViewModel
@@ -28,21 +29,11 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
         composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
         composable(BottomNavItem.Settings.route) { SettingsScreen(navController) }
-    composable("my_cars") {
-            val viewModel: MyCarViewModel = hiltViewModel()
-            MyCarsScreen(
-                onNavigateToAddCar = { navController.navigate("add_car") },
-                onNavigateToCarDetail = { carId -> navController.navigate("car_detail/$carId") },
-                viewModel = viewModel
-            )
-        }
-        composable("add_car") {
-            val myCarViewModel: MyCarViewModel = hiltViewModel()
-            AddCarScreen(navController, myCarViewModel)
-        }
+        composable(BottomNavItem.MyCars.route) { MyCarsScreen(navController) }
+        composable(AppNavItem.UserCars.route) { UserCarsScreen(navController) }
+        composable(AppNavItem.AddCar.route) { AddCarScreen(navController) }
     }
 }
-
 
 fun getStartDestination(context: Context): String {
     val token = PreferencesManager(context).jwtToken

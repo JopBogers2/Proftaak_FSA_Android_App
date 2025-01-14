@@ -12,6 +12,7 @@ import com.example.rentmycar.api.requests.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.api.responses.AuthResponse
 import com.example.rentmycar.api.responses.LocationResponse
+import com.example.rentmycar.api.requests.CarDTO
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -46,7 +47,7 @@ interface ApiService {
     @GET("model/brand/{brandId}")
     suspend fun getModelsByBrand(@Path("brandId") brandId: Int): Response<List<ModelDTO>>
 
- @POST("car/location")
+    @POST("car/location")
     suspend fun addCarLocation(@Body request: LocationRequest): Response<Unit>
 
     @PUT("car/location")
@@ -57,5 +58,8 @@ interface ApiService {
 
     @POST("car/register")
     suspend fun registerCar(@Body request: RegisterCarRequest): Response<ResponseBody>
+
+    @GET("car/owner")
+    suspend fun getOwnerCars(): Response<List<CarDTO>>
 
 }

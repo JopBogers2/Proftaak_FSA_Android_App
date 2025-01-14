@@ -8,6 +8,7 @@ import com.example.rentmycar.api.ApiService
 import com.example.rentmycar.api.requests.CarResponse
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.api.requests.BrandDTO
+import com.example.rentmycar.api.requests.CarDTO
 import com.example.rentmycar.api.requests.LocationRequest
 import com.example.rentmycar.api.requests.ModelDTO
 import com.example.rentmycar.api.responses.LocationResponse
@@ -69,9 +70,17 @@ class MyCarViewModel @Inject constructor(
 
     init {
         fetchBrands()
+
     }
 
-    // Make fetchBrands public
+
+
+
+
+
+
+
+
     fun fetchBrands() {
         viewModelScope.launch {
             _dataLoadingState.value = DataLoadingState.Loading
@@ -176,10 +185,9 @@ class MyCarViewModel @Inject constructor(
 
 sealed class MyCarViewState {
     object Loading : MyCarViewState()
+    data class Success(val cars: List<CarDTO>) : MyCarViewState()
     object NoCars : MyCarViewState()
-    data class Success(val cars: List<CarResponse>) : MyCarViewState()
     data class Error(val message: String) : MyCarViewState()
-    object BrandsAndModelsLoadFailure : MyCarViewState() // Add this new state
 }
 sealed class RegistrationState {
     object Idle : RegistrationState()
