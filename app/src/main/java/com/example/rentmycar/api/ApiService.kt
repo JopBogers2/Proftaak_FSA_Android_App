@@ -21,6 +21,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.QueryMap
 
 interface ApiService {
     @POST("user/login")
@@ -62,4 +63,22 @@ interface ApiService {
     @GET("car/owner")
     suspend fun getOwnerCars(): Response<List<CarDTO>>
 
+    suspend fun getFilteredCars(
+        @QueryMap filters: Map<String, String>
+    ): Response<List<CarResponse>>
+
+    @GET("car/{id}")
+    suspend fun getCar(
+        @Path("id") carId: Int
+    ): Response<CarResponse>
+
+    @GET("image/car/{id}")
+    suspend fun getImagesByCar(
+        @Path("id") carId: Int,
+    ): Response<List<String>>
+
+    @GET("car/{id}/location")
+    suspend fun getLocationByCar(
+        @Path("id") carId: Int,
+    ): Response<CarLocationResponse>
 }

@@ -1,23 +1,17 @@
 package com.example.rentmycar.viewmodel
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.ApiCallHandler
 import com.example.rentmycar.api.ApiService
+import com.example.rentmycar.api.requests.CarLocationResponse
 import com.example.rentmycar.api.requests.CarResponse
-import com.example.rentmycar.api.requests.UserResponse
 import com.example.rentmycar.exceptions.ApiException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface CarViewState {
-    data class Success(val cars: List<CarResponse>) : CarViewState
-    data object Loading : CarViewState
-    data class Error(val message: String) : CarViewState
-}
 
 @HiltViewModel
 class CarViewModel @Inject constructor(
@@ -26,18 +20,84 @@ class CarViewModel @Inject constructor(
 ) : ViewModel() {
     val logoutEvent = apiCallHandler.logoutEvent
 
-    private val _viewState = MutableStateFlow<CarViewState>(CarViewState.Loading)
-    val viewState = _viewState.asStateFlow()
+    private val _car = MutableLiveData<CarResponse>()
+    val car: LiveData<CarResponse> get() = _car
 
-    fun getCars() {
+    private val _images = MutableLiveData<List<String>>()
+    val images: LiveData<List<String>> get() = _images
+
+    private val _location = MutableLiveData<CarLocationResponse>()
+    val location: LiveData<CarLocationResponse> get() = _location
+
+    /**
+     * Fetched the images attached to the car
+     */
+    private fun loadImages(id: Int) {
         viewModelScope.launch {
             try {
                 val response = apiCallHandler.makeApiCall {
-                    apiService.getFilteredCars()
+                    apiService.getImagesByCar(id)
                 }
-                _viewState.update { CarViewState.Success(response) }
-            } catch (e: Exception) {
-                _viewState.update { CarViewState.Error(e.message ?: "Unknown error") }
+                _images.postValue(response)
+            } catch (e: ApiException) {
+                // TODO
+            }
+        }
+    }
+
+    /**
+     * Fetch the location of the car
+     */
+    private fun loadLocation(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = apiCallHandler.makeApiCall {
+                    apiService.getLocationByCar(id)
+                }
+                _location.postValue(response)
+            } catch (e: ApiException) {
+                // TODO
+            }
+        }
+    }
+
+    /**
+     * Fetch the car in case it was not provided initially
+     */
+    private fun loadCar(carId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = apiCallHandler.makeApiCall {
+                    apiService.getCar(carId)
+                }
+                _car.postValue(response)
+            } catch (e: ApiException) {
+                // TODO
+            }
+        }
+    }
+
+    /**
+     * Initialize the car via fetching it
+     */
+    fun initCar(carId: Int) {
+        viewModelScope.launch {
+            loadCar(carId)
+            loadImages(carId)
+            loadLocation(carId)
+        }
+    }
+
+    /**
+     * Initialize the car via fetching additional info only
+     */
+    fun initCar(car: CarResponse, initLocation: Boolean = false) {
+        viewModelScope.launch {
+            _car.postValue(car)
+            loadImages(car.id)
+
+            if (initLocation) {
+                loadLocation(car.id)
             }
         }
     }
