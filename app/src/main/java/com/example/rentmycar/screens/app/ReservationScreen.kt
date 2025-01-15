@@ -59,6 +59,10 @@ fun ReservationScreen(navController: NavHostController) {
                             .fillMaxHeight(),
                         verticalArrangement = Arrangement.Top,
                     ) {
+                        Text(
+                            "Reservations",
+                            style = MaterialTheme.typography.headlineMedium,
+                        )
                         LazyColumn(modifier = Modifier.fillMaxHeight()) {
                             items(state.reservations.size) { index ->
                                 ReservationCard(state.reservations[index], navController)
