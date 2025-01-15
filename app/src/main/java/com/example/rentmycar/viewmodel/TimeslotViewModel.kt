@@ -38,7 +38,7 @@ class TimeslotViewModel @Inject constructor(
                     apiService.getUserReservations()
                 }.forEach { reservation ->
                     reservedTimeslots.add(apiCallHandler.makeApiCall {
-                        apiService.getTimeslotById(reservation.id)
+                        apiService.getTimeslotById(reservation.timeslotId)
                     })
                 }
 

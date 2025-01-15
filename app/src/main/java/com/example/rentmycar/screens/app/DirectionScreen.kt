@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -63,7 +65,8 @@ fun DirectionScreen(
                     Column(
                         modifier = Modifier
                             .padding(16.dp)
-                            .fillMaxHeight(),
+                            .fillMaxHeight()
+                            .fillMaxWidth(),
                         verticalArrangement = Arrangement.Top,
                     ) {
                         Text(
@@ -82,10 +85,15 @@ fun DirectionScreen(
                             )
                             Text("Back to reservations")
                         }
-                        Text(
-                            text = state.message,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = state.message,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
                     }
                 }
 
