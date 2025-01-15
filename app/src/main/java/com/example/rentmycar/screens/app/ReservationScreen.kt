@@ -20,31 +20,31 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.rentmycar.components.ReservationCard
-import com.example.rentmycar.viewmodel.TimeslotViewModel
-import com.example.rentmycar.viewmodel.TimeslotViewState
+import com.example.rentmycar.viewmodel.ReservationViewModel
+import com.example.rentmycar.viewmodel.ReservationViewState
 
 @Composable
 fun ReservationScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<TimeslotViewModel>()
+    val viewModel = hiltViewModel<ReservationViewModel>()
 
     AuthenticatedScreen(navController, viewModel.logoutEvent) {
         val viewState by viewModel.viewState.collectAsState()
 
         LaunchedEffect(Unit) {
-            viewModel.getTimeslotsReservedByUser()
+            viewModel.getUserReservations()
         }
 
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
             when (val state = viewState) {
-                TimeslotViewState.Loading -> {
+                ReservationViewState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
 
-                is TimeslotViewState.Error -> {
+                is ReservationViewState.Error -> {
                     Text(
                         text = state.message,
                         style = MaterialTheme.typography.bodyLarge,
@@ -52,7 +52,7 @@ fun ReservationScreen(navController: NavHostController) {
                     )
                 }
 
-                is TimeslotViewState.Success -> {
+                is ReservationViewState.Success -> {
                     Column(
                         modifier = Modifier
                             .padding(16.dp)

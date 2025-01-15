@@ -65,9 +65,18 @@ interface ApiService {
     @GET("reservation/user")
     suspend fun getUserReservations(): Response<List<ReservationResponse>>
 
+    @GET("/reservation/timeslot/{id}")
+    suspend fun getTimeslotReservations(
+        @Path("id") timeSlotId: Int,
+    ): Response<List<ReservationResponse>>
+
     @GET("timeSlot/{id}")
     suspend fun getTimeslotById(
         @Path("id") timeSlotId: Int,
     ): Response<TimeslotResponse>
 
+    @GET("timeSlot/car/{id}")
+    suspend fun getTimeslotsByCarId(
+        @Path("id") timeSlotId: Int,
+    ): Response<List<TimeslotResponse>>
 }
