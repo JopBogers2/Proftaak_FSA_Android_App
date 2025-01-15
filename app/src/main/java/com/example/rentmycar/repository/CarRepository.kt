@@ -14,14 +14,13 @@ package com.example.rentmycar.repository
     import okhttp3.MediaType.Companion.toMediaTypeOrNull
     import okhttp3.MultipartBody
     import okhttp3.RequestBody.Companion.asRequestBody
-
     import okhttp3.ResponseBody
     import okhttp3.RequestBody.Companion.toRequestBody
     import retrofit2.HttpException
     import java.io.File
     import java.io.IOException
     import javax.inject.Inject
-import android.net.Uri
+    import android.net.Uri
 
 
     class CarRepository @Inject constructor(private val apiService: ApiService) {

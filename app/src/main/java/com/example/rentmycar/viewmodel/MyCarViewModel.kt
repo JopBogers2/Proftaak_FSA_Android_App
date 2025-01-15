@@ -64,21 +64,10 @@ class MyCarViewModel @Inject constructor(
 
 
 
-
-
-
-
     init {
         fetchBrands()
 
     }
-
-
-
-
-
-
-
 
 
     fun fetchBrands() {
@@ -127,7 +116,7 @@ class MyCarViewModel @Inject constructor(
                 result.fold(
                     onSuccess = { response ->
                         _registrationState.value = RegistrationState.Success(response)
-                        // Assuming the response is the car ID as a string
+
                         onComplete(response.toIntOrNull())
                     },
                     onFailure = { error ->

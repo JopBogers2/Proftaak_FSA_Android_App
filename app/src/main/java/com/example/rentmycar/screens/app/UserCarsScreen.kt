@@ -1,6 +1,7 @@
 package com.example.rentmycar.screens.app
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +20,6 @@ import com.example.rentmycar.api.requests.CarDTO
 import com.example.rentmycar.api.responses.LocationResponse
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
-
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,6 +28,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyRow
 import coil.compose.rememberImagePainter
 import com.example.rentmycar.components.ImageCarousel
+import android.content.Intent
+import android.provider.MediaStore
+import androidx.core.content.FileProvider
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = hiltViewModel()) {
@@ -118,9 +124,47 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
     val context = LocalContext.current
     val carImages by viewModel.carImages.collectAsState()
 
+    var tempImageUri by remember { mutableStateOf<Uri?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+    var isUploading by remember { mutableStateOf(false) }
+
     LaunchedEffect(car.id) {
         viewModel.getImagesByCar(car.id)
     }
+
+    LaunchedEffect(isUploading) {
+        if (!isUploading) {
+            viewModel.getImagesByCar(car.id)
+        }
+    }
+
+
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            isUploading = true
+            viewModel.uploadCarImage(car.id, it) { success ->
+                if (success) {
+                    isUploading = false
+                }
+            }
+        }
+    }
+
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            tempImageUri?.let { uri ->
+                isUploading = true
+                viewModel.uploadCarImage(car.id, uri) { uploadSuccess ->
+                    if (uploadSuccess) {
+                        isUploading = false
+                    }
+                }
+            }
+        }
+    }
+
+
 
     Card(
         modifier = Modifier
@@ -173,10 +217,39 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                Button(onClick = { /* Implement image upload logic */ }) {
-                    Text("Upload Image")
+                Button(onClick = { showDialog = true }) {
+                    Text("Upload")
                 }
             }
         }
+    }
+
+  if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Upload Image") },
+            text = { Text("Choose an option") },
+            confirmButton = {
+                Button(onClick = {
+                    showDialog = false
+                    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                    val storageDir: File? = context.getExternalFilesDir(null)
+                    val tempFile = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+                    val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tempFile)
+                    tempImageUri = uri
+                    cameraLauncher.launch(uri)
+                }) {
+                    Text("Take Photo")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showDialog = false
+                    galleryLauncher.launch("image/*")
+                }) {
+                    Text("Choose from Gallery")
+                }
+            }
+        )
     }
 }

@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.requests.CarDTO
 import com.example.rentmycar.api.requests.LocationRequest
-
 import com.example.rentmycar.api.responses.LocationResponse
 import com.example.rentmycar.repository.CarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -62,8 +61,8 @@ class UserCarsViewModel @Inject constructor(
             try {
                 val locationRequest = LocationRequest(carId, latitude, longitude)
                 val response = carRepository.addCarLocation(locationRequest)
-                // Handle the response if needed
-                getUserCars() // Refresh the car list
+
+                getUserCars()
             } catch (e: Exception) {
                 _viewState.value = UserCarsViewState.Error("Failed to add car location: ${e.message}")
             }
@@ -75,7 +74,8 @@ class UserCarsViewModel @Inject constructor(
 private val _carImages = MutableStateFlow<Map<Int, List<String>>>(emptyMap())
 val carImages: StateFlow<Map<Int, List<String>>> = _carImages
 
-fun uploadCarImage(carId: Int, imageUri: Uri) {
+
+fun uploadCarImage(carId: Int, imageUri: Uri, onComplete: (Boolean) -> Unit) {
     viewModelScope.launch {
         try {
             Log.d("UserCarsViewModel", "Starting image upload for car $carId")
@@ -85,19 +85,23 @@ fun uploadCarImage(carId: Int, imageUri: Uri) {
                 val result = carRepository.uploadCarImage(carId, file)
                 result.onSuccess { message ->
                     Log.d("UserCarsViewModel", "Image upload successful. Message: $message")
-                    // Refresh the car images
 
+                    getImagesByCar(carId)
+                    onComplete(true)
                 }.onFailure { error ->
                     Log.e("UserCarsViewModel", "Failed to upload image", error)
                     _viewState.value = UserCarsViewState.Error("Failed to upload image: ${error.message}")
+                    onComplete(false)
                 }
             } else {
                 Log.e("UserCarsViewModel", "Failed to create file from URI")
                 _viewState.value = UserCarsViewState.Error("Failed to create file from URI")
+                onComplete(false)
             }
         } catch (e: Exception) {
             Log.e("UserCarsViewModel", "Error uploading image", e)
             _viewState.value = UserCarsViewState.Error("Error uploading image: ${e.message}")
+            onComplete(false)
         }
     }
 }
@@ -149,7 +153,7 @@ fun getImagesByCar(carId: Int) {
                 }
             }.onFailure { error ->
                 Log.e("UserCarsViewModel", "Error fetching images for car $carId: ${error.message}", error)
-                // You might want to update the UI to show an error message
+
                 _viewState.value = UserCarsViewState.Error("Failed to fetch images for car $carId: ${error.message}")
             }
         } catch (e: Exception) {

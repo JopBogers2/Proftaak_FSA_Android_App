@@ -16,8 +16,6 @@ import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.viewmodel.MyCarViewModel
 import com.example.rentmycar.api.requests.BrandDTO
 import com.example.rentmycar.api.requests.CarResponse
-
-
 import com.example.rentmycar.api.requests.ModelDTO
 import com.example.rentmycar.viewmodel.DataLoadingState
 import com.example.rentmycar.viewmodel.RegistrationState
@@ -39,13 +37,8 @@ fun AddCarScreen(
     val selectedModelId by viewModel.selectedModelId.collectAsState(initial = null)
     val selectedBrand by viewModel.selectedBrand.collectAsState(initial = null)
     val selectedModel by viewModel.selectedModel.collectAsState(initial = null)
-
-
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-
-
-
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var fieldErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var isCarAdded by remember { mutableStateOf(false) }
@@ -59,9 +52,6 @@ fun AddCarScreen(
     var expandedModel by remember { mutableStateOf(false) }
     var expandedTransmission by remember { mutableStateOf(false) }
     var expandedFuelType by remember { mutableStateOf(false) }
-
-
-
     val transmissionOptions = listOf("AUTOMATIC", "MANUAL")
     val fuelTypeOptions = listOf("DIESEL", "PETROL", "GAS", "ELECTRIC", "HYDROGEN")
 
@@ -73,7 +63,7 @@ LaunchedEffect(registrationState) {
     Log.d("AddCarScreen", "Registration state changed: $registrationState")
     when (registrationState) {
         is RegistrationState.Success -> {
-            Log.d("AddCarScreen", "Car added successfully")
+
             isCarAdded = true
             // Clear form fields
             licensePlate = ""
@@ -84,8 +74,8 @@ LaunchedEffect(registrationState) {
             selectedFuelType = null
             viewModel.selectBrand(-1)
             viewModel.selectModel(-1)
-            // Show success message
-            errorMessage = "Car added successfully!"
+
+
         }
         is RegistrationState.Error -> {
             Log.e("AddCarScreen", "Error adding car: ${(registrationState as RegistrationState.Error).message}")
@@ -101,8 +91,6 @@ LaunchedEffect(registrationState) {
         }
     }
 }
-
-
 
 
 
@@ -123,7 +111,7 @@ LaunchedEffect(registrationState) {
                 errorMessage = null
             }
             else -> {
-                // Handle other states if needed
+
             }
         }
     }
@@ -137,10 +125,6 @@ LaunchedEffect(registrationState) {
 
 
 
-
-
-
-                // Brand dropdown
                 ExposedDropdownMenuBox(
                     expanded = expandedBrand,
                     onExpandedChange = { expandedBrand = !expandedBrand }
@@ -170,7 +154,7 @@ LaunchedEffect(registrationState) {
                     }
                 }
 
-                // Model dropdown
+
                 if (selectedBrandId != null) {
                     ExposedDropdownMenuBox(
                         expanded = expandedModel,
@@ -202,7 +186,7 @@ LaunchedEffect(registrationState) {
                     }
                 }
 
-                // License Plate
+
                 CarTextField(
                     value = licensePlate,
                     onValueChange = { licensePlate = it },
@@ -210,7 +194,7 @@ LaunchedEffect(registrationState) {
                     error = fieldErrors["licensePlate"]
                 )
 
-                // Year
+
                 CarTextField(
                     value = year,
                     onValueChange = { year = it },
@@ -218,7 +202,6 @@ LaunchedEffect(registrationState) {
                     error = fieldErrors["year"]
                 )
 
-                // Color
                 CarTextField(
                     value = color,
                     onValueChange = { color = it },
@@ -226,7 +209,6 @@ LaunchedEffect(registrationState) {
                     error = fieldErrors["color"]
                 )
 
-                // Price
                 CarTextField(
                     value = price,
                     onValueChange = { price = it },
@@ -234,7 +216,7 @@ LaunchedEffect(registrationState) {
                     error = fieldErrors["price"]
                 )
 
-                // Transmission dropdown
+
                 ExposedDropdownMenuBox(
                     expanded = expandedTransmission,
                     onExpandedChange = { expandedTransmission = !expandedTransmission }
@@ -264,7 +246,7 @@ LaunchedEffect(registrationState) {
                     }
                 }
 
-                // Fuel Type dropdown
+
                 ExposedDropdownMenuBox(
                     expanded = expandedFuelType,
                     onExpandedChange = { expandedFuelType = !expandedFuelType }
@@ -311,7 +293,7 @@ Button(
             if (carId != null) {
                 isCarAdded = true
                 errorMessage = "Car added successfully with ID: $carId"
-                // Clear form fields
+
                 licensePlate = ""
                 year = ""
                 color = ""
@@ -331,13 +313,7 @@ Button(
     Text("Add Car")
 }
 
-if (isCarAdded) {
-    Text(
-        "Car added successfully!",
-        color = Color.Green,
-        modifier = Modifier.padding(top = 16.dp)
-    )
-}
+
 
 if (errorMessage != null) {
     Text(
@@ -364,7 +340,7 @@ if (errorMessage != null) {
                 }
             }
             else -> {
-                // Handle initial state if needed
+                
             }
         }
 
