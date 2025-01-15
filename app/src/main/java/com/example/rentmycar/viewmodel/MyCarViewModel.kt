@@ -143,27 +143,6 @@ class MyCarViewModel @Inject constructor(
     }
 
 
-    fun addLocation(locationRequest: CustomLocationRequest) {
-        viewModelScope.launch {
-            try {
-                val result = carRepository.addCarLocation(
-                    locationRequest.carId,
-                    locationRequest.latitude,
-                    locationRequest.longitude
-                )
-                result.fold(
-                    onSuccess = { message ->
-                        _registrationState.value = RegistrationState.Success(message)
-                    },
-                    onFailure = { error ->
-                        _registrationState.value = RegistrationState.Error("Failed to add location: ${error.message}", emptyMap())
-                    }
-                )
-            } catch (e: Exception) {
-                _registrationState.value = RegistrationState.Error("Network error: ${e.message}", emptyMap())
-            }
-        }
-    }
 
 
 

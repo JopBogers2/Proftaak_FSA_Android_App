@@ -11,5 +11,6 @@ data class CarDTO(
     val color: String,
     val transmission: String,
     val price: Double,
-    val category: String
+    val category: String,
+
 )

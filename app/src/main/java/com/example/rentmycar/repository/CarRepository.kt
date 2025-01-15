@@ -13,11 +13,15 @@ package com.example.rentmycar.repository
     import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
     import okhttp3.MediaType.Companion.toMediaTypeOrNull
     import okhttp3.MultipartBody
+    import okhttp3.RequestBody.Companion.asRequestBody
+
     import okhttp3.ResponseBody
     import okhttp3.RequestBody.Companion.toRequestBody
     import retrofit2.HttpException
+    import java.io.File
     import java.io.IOException
     import javax.inject.Inject
+import android.net.Uri
 
 
     class CarRepository @Inject constructor(private val apiService: ApiService) {
@@ -35,6 +39,48 @@ package com.example.rentmycar.repository
         }
     }
 
+
+suspend fun getImagesByCar(carId: Int): Result<List<String>> {
+    return try {
+        val response = apiService.getImagesByCar(carId)
+        if (response.isSuccessful) {
+            val images = response.body() ?: emptyList()
+            Log.d("CarRepository", "Fetched images for car $carId: $images")
+            Result.success(images)
+        } else {
+            val errorBody = response.errorBody()?.string()
+            val errorCode = response.code()
+            Log.e("CarRepository", "Failed to fetch images for car $carId. Status Code: $errorCode, Error Body: $errorBody")
+            Result.failure(Exception("Failed to fetch images. Status Code: $errorCode, Error: $errorBody"))
+        }
+    } catch (e: Exception) {
+        Log.e("CarRepository", "Exception when fetching images for car $carId", e)
+        Result.failure(Exception("Exception when fetching images: ${e.message}", e))
+    }
+}
+suspend fun uploadCarImage(carId: Int, file: File): Result<String> {
+    return try {
+        val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val part = MultipartBody.Part.createFormData("image", file.name, requestBody)
+        val response = apiService.uploadCarImage(carId, part)
+        if (response.isSuccessful) {
+            val responseBody = response.body()?.string()
+            Log.d("CarRepository", "Upload response: $responseBody")
+            if (responseBody.isNullOrEmpty()) {
+                Result.success("Image uploaded successfully")
+            } else {
+                Result.success(responseBody)
+            }
+        } else {
+            val errorBody = response.errorBody()?.string()
+            Log.e("CarRepository", "Upload failed: $errorBody")
+            Result.failure(Exception("Failed to upload image: $errorBody"))
+        }
+    } catch (e: Exception) {
+        Log.e("CarRepository", "Exception during upload", e)
+        Result.failure(e)
+    }
+}
 
 
 
@@ -55,35 +101,18 @@ suspend fun registerCar(request: RegisterCarRequest): Result<String> {
     }
 }
 
-    suspend fun addCarLocation(carId: Int, latitude: Double, longitude: Double): Result<String> {
-        return try {
-            val request = LocationRequest(carId, latitude, longitude)
-            val response = apiService.addCarLocation(request)
-            if (response.isSuccessful) {
-                Result.success("Location added successfully")
-            } else {
-                Result.failure(Exception("Failed to add location: ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
+suspend fun addCarLocation(locationRequest: LocationRequest): Result<Unit> {
+    return try {
+        val response = apiService.addCarLocation(locationRequest)
+        if (response.isSuccessful) {
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Failed to add car location: ${response.errorBody()?.string()}"))
         }
+    } catch (e: Exception) {
+        Result.failure(Exception("Error adding car location: ${e.message}", e))
     }
-
-    suspend fun updateCarLocation(carId: Int, latitude: Double, longitude: Double): Result<String> {
-        return try {
-            val request = LocationRequest(carId, latitude, longitude)
-            val response = apiService.updateCarLocation(request)
-            if (response.isSuccessful) {
-                Result.success("Location updated successfully")
-            } else {
-                Result.failure(Exception("Failed to update location: ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-
+}
     suspend fun getBrands(): List<BrandDTO>? {
         return try {
             val response = apiService.getBrands()

@@ -13,7 +13,12 @@ import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.api.responses.AuthResponse
 import com.example.rentmycar.api.responses.LocationResponse
 import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.api.requests.CarLocationResponse
+
+
 import okhttp3.ResponseBody
+import okhttp3.MultipartBody
+import retrofit2.http.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -21,6 +26,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
 interface ApiService {
@@ -39,8 +45,6 @@ interface ApiService {
     @PUT("user/update")
     suspend fun updateUser(@Body request: UserUpdateRequest): Response<MessageResponse>
 
-    @GET("car/all/filtered")
-    suspend fun getFilteredCars(): Response<List<CarResponse>>
 
     @GET("brand/all")  // Ensure this matches your backend route
     suspend fun getBrands(): Response<List<BrandDTO>>
@@ -57,12 +61,14 @@ interface ApiService {
     @GET("car/{carId}/location")
     suspend fun getCarLocation(@Path("carId") carId: Int): Response<LocationResponse>
 
+
     @POST("car/register")
     suspend fun registerCar(@Body request: RegisterCarRequest): Response<ResponseBody>
 
     @GET("car/owner")
     suspend fun getOwnerCars(): Response<List<CarDTO>>
 
+    @GET("car/all/filtered")
     suspend fun getFilteredCars(
         @QueryMap filters: Map<String, String>
     ): Response<List<CarResponse>>
@@ -72,13 +78,23 @@ interface ApiService {
         @Path("id") carId: Int
     ): Response<CarResponse>
 
-    @GET("image/car/{id}")
+
+@Multipart
+@POST("image/car/{id}")
+suspend fun uploadCarImage(
+    @Path("id") carId: Int,
+    @Part image: MultipartBody.Part
+): Response<ResponseBody>
+
+      @GET("image/car/{id}")
     suspend fun getImagesByCar(
         @Path("id") carId: Int,
     ): Response<List<String>>
+
 
     @GET("car/{id}/location")
     suspend fun getLocationByCar(
         @Path("id") carId: Int,
     ): Response<CarLocationResponse>
 }
+data class MessageResponse(val message: String)
