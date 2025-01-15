@@ -99,17 +99,21 @@ suspend fun registerCar(request: RegisterCarRequest): Result<String> {
         Result.failure(e)
     }
 }
-
 suspend fun addCarLocation(locationRequest: LocationRequest): Result<Unit> {
     return try {
+        Log.d("CarRepository", "Sending location request: $locationRequest")
         val response = apiService.addCarLocation(locationRequest)
         if (response.isSuccessful) {
+            Log.d("CarRepository", "Location added successfully")
             Result.success(Unit)
         } else {
-            Result.failure(Exception("Failed to add car location: ${response.errorBody()?.string()}"))
+            val errorBody = response.errorBody()?.string()
+            Log.e("CarRepository", "Failed to add car location. Status: ${response.code()}, Error: $errorBody")
+            Result.failure(Exception("Failed to add car location: $errorBody"))
         }
+        Result.success(Unit)
     } catch (e: Exception) {
-        Result.failure(Exception("Error adding car location: ${e.message}", e))
+        Result.failure(e)
     }
 }
     suspend fun getBrands(): List<BrandDTO>? {

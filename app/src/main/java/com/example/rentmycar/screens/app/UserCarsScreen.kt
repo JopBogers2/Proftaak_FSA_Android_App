@@ -42,6 +42,8 @@ fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val refreshTrigger by viewModel.refreshTrigger.collectAsState()
+
     var hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -202,18 +204,16 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row {
-                Button(
-                    onClick = {
-                        val currentLocation = (viewModel.locationState.value as? UserCarsViewModel.LocationState.LocationAvailable)?.location
-                        if (currentLocation != null) {
-                            viewModel.addCarLocation(car.id, currentLocation.latitude, currentLocation.longitude)
-                        }
-                    },
-                    enabled = viewModel.locationState.value is UserCarsViewModel.LocationState.LocationAvailable
-                ) {
-                    Text("Add Location")
-                }
+   Row {
+        Button(
+            onClick = {
+                Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
+                viewModel.addCarLocation(car.id)
+            },
+            enabled = true
+        ) {
+            Text("Add Location")
+        }
 
                 Spacer(modifier = Modifier.width(8.dp))
 

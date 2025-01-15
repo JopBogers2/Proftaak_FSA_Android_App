@@ -23,6 +23,13 @@ import java.io.File
 import javax.inject.Inject
 import java.io.FileOutputStream
 import kotlinx.coroutines.withContext
+import com.google.android.gms.location.LocationServices
+
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import android.os.Looper
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 
 @HiltViewModel
 class UserCarsViewModel @Inject constructor(
@@ -35,6 +42,10 @@ class UserCarsViewModel @Inject constructor(
 
     private val _locationState = MutableStateFlow<LocationState>(LocationState.NoLocation)
     val locationState: StateFlow<LocationState> = _locationState
+
+     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+
 
     fun getUserCars() {
         viewModelScope.launch {
@@ -56,17 +67,50 @@ class UserCarsViewModel @Inject constructor(
         _locationState.value = LocationState.LocationAvailable(location)
     }
 
-    fun addCarLocation(carId: Int, latitude: Double, longitude: Double) {
+
+ private val _refreshTrigger = MutableStateFlow(0)
+    val refreshTrigger: StateFlow<Int> = _refreshTrigger
+
+    fun addCarLocation(carId: Int) {
         viewModelScope.launch {
             try {
-                val locationRequest = LocationRequest(carId, latitude, longitude)
-                val response = carRepository.addCarLocation(locationRequest)
-
-                getUserCars()
+                val cancellationTokenSource = CancellationTokenSource()
+                fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+                    .addOnSuccessListener { location ->
+                        if (location != null) {
+                            viewModelScope.launch {
+                                val latitude = location.latitude
+                                val longitude = location.longitude
+                                Log.d("UserCarsViewModel", "Adding location for car $carId: $latitude, $longitude")
+                                val locationRequest = LocationRequest(carId, latitude, longitude)
+                                val result = carRepository.addCarLocation(locationRequest)
+                                result.onSuccess {
+                                    Log.d("UserCarsViewModel", "Location added successfully for car $carId")
+                                    refreshCarList()
+                                }.onFailure { error ->
+                                    Log.e("UserCarsViewModel", "Failed to add location for car $carId", error)
+                                    _viewState.value = UserCarsViewState.Error("Failed to add location: ${error.message}")
+                                }
+                            }
+                        } else {
+                            Log.e("UserCarsViewModel", "Location is null")
+                            _viewState.value = UserCarsViewState.Error("Failed to get current location")
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("UserCarsViewModel", "Error getting location", e)
+                        _viewState.value = UserCarsViewState.Error("Error getting location: ${e.message}")
+                    }
             } catch (e: Exception) {
-                _viewState.value = UserCarsViewState.Error("Failed to add car location: ${e.message}")
+                Log.e("UserCarsViewModel", "Error in addCarLocation", e)
+                _viewState.value = UserCarsViewState.Error("Error adding car location: ${e.message}")
             }
         }
+    }
+
+    fun refreshCarList() {
+        _refreshTrigger.value += 1
+        getUserCars()
     }
 
 
