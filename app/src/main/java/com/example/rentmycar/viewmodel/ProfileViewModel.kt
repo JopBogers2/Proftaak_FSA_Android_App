@@ -71,6 +71,5 @@ class ProfileViewModel @Inject constructor(
                 _viewState.update { ProfileViewState.Error(e.message) }
             }
         }
-
     }
 }

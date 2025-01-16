@@ -13,7 +13,7 @@ import com.example.rentmycar.PreferencesManager
 import com.example.rentmycar.screens.app.CarItemScreen
 import com.example.rentmycar.screens.app.DirectionScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
-import com.example.rentmycar.screens.app.ReservationScreen
+import com.example.rentmycar.screens.app.ReservationsScreen
 import com.example.rentmycar.screens.app.AvailableTimeslotsScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
@@ -27,7 +27,7 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         composable(AppNavItem.Register.route) { RegisterScreen(navController) }
         composable(BottomNavItem.Home.route) { HomeScreen(navController, context) }
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
-        composable(BottomNavItem.Reservations.route) { ReservationScreen(navController) }
+        composable(BottomNavItem.Reservations.route) { ReservationsScreen(navController) }
         composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
         composable("carItem/{carId}", arguments = listOf(
             navArgument("carId") {

@@ -1,5 +1,6 @@
 package com.example.rentmycar.api
 
+import com.example.rentmycar.api.requests.CreateReservationRequest
 import com.example.rentmycar.api.requests.DirectionsToCarRequest
 import com.example.rentmycar.api.responses.CarLocationResponse
 import com.example.rentmycar.api.responses.CarResponse
@@ -12,7 +13,6 @@ import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.api.responses.AuthResponse
 import com.example.rentmycar.api.responses.DirectionsToCarResponse
-import com.squareup.moshi.Json
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -66,9 +66,22 @@ interface ApiService {
     suspend fun getUserReservations(): Response<List<ReservationResponse>>
 
     @GET("/reservation/timeslot/{id}")
-    suspend fun getTimeslotReservations(
+    suspend fun getTimeslotReservation(
         @Path("id") timeSlotId: Int,
-    ): Response<List<ReservationResponse>>
+    ): Response<ReservationResponse>
+
+
+    @POST("/reservation/create")
+    suspend fun createReservation(
+        @Body request: CreateReservationRequest
+    ): Response<MessageResponse>
+
+
+    @DELETE("/reservation/{id}")
+    suspend fun cancelReservation(
+        @Path("id") reservationId: Int,
+    ): Response<MessageResponse>
+
 
     @GET("timeSlot/{id}")
     suspend fun getTimeslotById(

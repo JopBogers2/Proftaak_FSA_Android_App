@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.ApiCallHandler
 import com.example.rentmycar.api.ApiService
+import com.example.rentmycar.api.responses.ReservationResponse
 import com.example.rentmycar.api.responses.TimeslotResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,7 @@ sealed interface ReservationViewState {
 }
 
 @HiltViewModel
-class ReservationViewModel @Inject constructor(
+class ReservationsViewModel @Inject constructor(
     private val apiCallHandler: ApiCallHandler,
     private val apiService: ApiService
 ) : ViewModel() {
@@ -28,10 +29,12 @@ class ReservationViewModel @Inject constructor(
     private val _viewState = MutableStateFlow<ReservationViewState>(ReservationViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
+    private val reservedTimeslots = mutableListOf<TimeslotResponse>()
+
     fun getUserReservations() {
         viewModelScope.launch {
+            _viewState.update { ReservationViewState.Loading }
             try {
-                val reservedTimeslots = mutableListOf<TimeslotResponse>()
                 // Fetch user reservations, and retrieve associated timeslots.
                 apiCallHandler.makeApiCall {
                     apiService.getUserReservations()
@@ -49,4 +52,29 @@ class ReservationViewModel @Inject constructor(
             }
         }
     }
+
+    fun cancelReservation(reservedTimeslot: TimeslotResponse) {
+        viewModelScope.launch {
+            _viewState.update { ReservationViewState.Loading }
+            try {
+                apiCallHandler.makeApiCall {
+                    apiService.cancelReservation(
+                        getReservationByTimeslot(reservedTimeslot).id
+                    )
+                }.let {
+                    reservedTimeslots.remove(reservedTimeslot)
+                    _viewState.update { ReservationViewState.Success(reservedTimeslots) }
+                }
+            } catch (e: Exception) {
+                _viewState.update { ReservationViewState.Error(e.message ?: "Unknown error") }
+            }
+        }
+    }
+
+    private suspend fun getReservationByTimeslot(timeslot: TimeslotResponse): ReservationResponse =
+        apiCallHandler.makeApiCall {
+            apiService.getTimeslotReservation(
+                timeslot.id
+            )
+        }
 }

@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.rentmycar.components.ReservationCard
-import com.example.rentmycar.viewmodel.ReservationViewModel
+import com.example.rentmycar.viewmodel.ReservationsViewModel
 import com.example.rentmycar.viewmodel.ReservationViewState
 
 @Composable
-fun ReservationScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<ReservationViewModel>()
+fun ReservationsScreen(navController: NavHostController) {
+    val viewModel = hiltViewModel<ReservationsViewModel>()
 
     AuthenticatedScreen(navController, viewModel.logoutEvent) {
         val viewState by viewModel.viewState.collectAsState()

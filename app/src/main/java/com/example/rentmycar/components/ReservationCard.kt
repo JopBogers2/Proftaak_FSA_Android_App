@@ -21,20 +21,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.rentmycar.api.responses.TimeslotResponse
-import com.example.rentmycar.navigation.AppNavItem
-import com.example.rentmycar.screens.app.DirectionScreen
+import com.example.rentmycar.viewmodel.ReservationsViewModel
 
 /**
  * Card which contains general info about the car without details or location.
  */
 @Composable
-fun ReservationCard(reservation: TimeslotResponse, navController: NavController) {
+fun ReservationCard(reservedTimeslot: TimeslotResponse, navController: NavController) {
+    val viewModel = hiltViewModel<ReservationsViewModel>()
+
     OutlinedCard(
         onClick = {
             // when you click on a reservation, you'll be taken to the reserved car's details.
-            navController.navigate("carItem/${reservation.carId}")
+            navController.navigate("carItem/${reservedTimeslot.carId}")
         },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -58,18 +60,18 @@ fun ReservationCard(reservation: TimeslotResponse, navController: NavController)
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "From: ${reservation.availableFrom}",
+                    "From: ${reservedTimeslot.availableFrom}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    "Until: ${reservation.availableUntil}",
+                    "Until: ${reservedTimeslot.availableUntil}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row {
                     Button(
                         onClick = {
-                            //
+                            viewModel.cancelReservation(reservedTimeslot)
                         },
                         modifier = Modifier
                             .fillMaxSize()
@@ -87,7 +89,7 @@ fun ReservationCard(reservation: TimeslotResponse, navController: NavController)
                     }
                     Button(
                         onClick = {
-                            navController.navigate("directions/${reservation.carId}")
+                            navController.navigate("directions/${reservedTimeslot.carId}")
                         },
                         modifier = Modifier
                             .fillMaxSize()

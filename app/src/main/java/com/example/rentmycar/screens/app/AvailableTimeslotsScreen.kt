@@ -27,12 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.rentmycar.components.TimeSlotCard
-import com.example.rentmycar.viewmodel.TimeslotViewModel
-import com.example.rentmycar.viewmodel.TimeslotViewState
+import com.example.rentmycar.viewmodel.TimeslotsViewModel
+import com.example.rentmycar.viewmodel.TimeslotsViewState
 
 @Composable
 fun AvailableTimeslotsScreen(navController: NavHostController, carId: Int) {
-    val viewModel = hiltViewModel<TimeslotViewModel>()
+    val viewModel = hiltViewModel<TimeslotsViewModel>()
 
     AuthenticatedScreen(navController, viewModel.logoutEvent) {
         val viewState by viewModel.viewState.collectAsState()
@@ -66,9 +66,8 @@ fun AvailableTimeslotsScreen(navController: NavHostController, carId: Int) {
                     )
                     Text("Back to car")
                 }
-
                 when (val state = viewState) {
-                    TimeslotViewState.Loading -> {
+                    TimeslotsViewState.Loading -> {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -80,7 +79,7 @@ fun AvailableTimeslotsScreen(navController: NavHostController, carId: Int) {
                         }
                     }
 
-                    is TimeslotViewState.Error -> {
+                    is TimeslotsViewState.Error -> {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
@@ -92,10 +91,10 @@ fun AvailableTimeslotsScreen(navController: NavHostController, carId: Int) {
                         }
                     }
 
-                    is TimeslotViewState.Success -> {
+                    is TimeslotsViewState.Success -> {
                         LazyColumn(modifier = Modifier.fillMaxHeight()) {
                             items(state.availableTimeslots.size) { index ->
-                                TimeSlotCard(state.availableTimeslots[index], navController)
+                                TimeSlotCard(state.availableTimeslots[index])
                             }
                         }
                     }
