@@ -23,9 +23,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.rentmycar.components.car.CarCard
 import com.example.rentmycar.components.car.FilterComponent
-import com.example.rentmycar.viewmodel.CarFiltersViewModel
-import com.example.rentmycar.viewmodel.CarsViewModel
-import com.example.rentmycar.viewmodel.CarsViewState
+import com.example.rentmycar.viewmodel.car.CarFiltersViewModel
+import com.example.rentmycar.viewmodel.car.CarsViewModel
+import com.example.rentmycar.viewmodel.car.CarsViewState
 
 @Composable
 fun HomeScreen(navController: NavHostController, context: Context) {

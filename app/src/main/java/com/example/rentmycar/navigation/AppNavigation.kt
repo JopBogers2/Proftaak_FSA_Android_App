@@ -2,26 +2,23 @@ package com.example.rentmycar.navigation
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.rentmycar.screens.app.HomeScreen
-import com.example.rentmycar.screens.app.ProfileScreen
 import com.example.rentmycar.PreferencesManager
-import com.example.rentmycar.screens.app.AddCarScreen
-import com.example.rentmycar.screens.app.CarItemScreen
+import com.example.rentmycar.screens.app.AvailableTimeslotsScreen
 import com.example.rentmycar.screens.app.DirectionScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
-import com.example.rentmycar.screens.app.MyCarsScreen
-import com.example.rentmycar.screens.app.UserCarsScreen
+import com.example.rentmycar.screens.app.HomeScreen
+import com.example.rentmycar.screens.app.ProfileScreen
 import com.example.rentmycar.screens.app.ReservationsScreen
-import com.example.rentmycar.screens.app.AvailableTimeslotsScreen
+import com.example.rentmycar.screens.app.car.CarItemScreen
+import com.example.rentmycar.screens.app.car.owner.AddCarScreen
+import com.example.rentmycar.screens.app.car.owner.OwnedCarsScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
-import com.example.rentmycar.viewmodel.MyCarViewModel
 
 
 @Composable
@@ -34,10 +31,9 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
         composable(BottomNavItem.Reservations.route) { ReservationsScreen(navController) }
         composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
-        composable(BottomNavItem.Settings.route) { SettingsScreen(navController) }
-        composable(BottomNavItem.MyCars.route) { MyCarsScreen(navController) }
-        composable(AppNavItem.UserCars.route) { UserCarsScreen(navController) }
-        composable(AppNavItem.AddCar.route) { AddCarScreen(navController) }
+        composable(BottomNavItem.MyCars.route) { OwnedCarsScreen(navController) }
+        composable(AppNavItem.UserCars.route) { OwnedCarsScreen(navController) }
+        composable(AppNavItem.AddCar.route) { AddCarScreen() }
 
         composable("carItem/{carId}", arguments = listOf(
             navArgument("carId") {

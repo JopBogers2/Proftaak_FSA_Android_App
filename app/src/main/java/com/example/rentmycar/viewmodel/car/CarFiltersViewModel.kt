@@ -1,4 +1,4 @@
-package com.example.rentmycar.viewmodel
+package com.example.rentmycar.viewmodel.car
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

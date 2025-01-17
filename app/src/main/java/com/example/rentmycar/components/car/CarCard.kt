@@ -27,7 +27,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.rentmycar.R
-import com.example.rentmycar.viewmodel.CarViewModel
+import com.example.rentmycar.viewmodel.car.CarViewModel
 
 /**
  * Card which contains general info about the car without details or location.

@@ -1,6 +1,6 @@
-package com.example.rentmycar.api.requests
+package com.example.rentmycar.api.responses
 
-data class ModelDTO(
+data class ModelResponse(
     val id: Int,
     val name: String,
     val brandId: Int,

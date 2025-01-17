@@ -12,7 +12,12 @@ import com.example.rentmycar.navigation.BottomNavItem
 
 @Composable
 fun BottomNavBar(navController: NavController) {
-    val items = listOf(BottomNavItem.Home, BottomNavItem.Profile, BottomNavItem.Settings, BottomNavItem.MyCars, BottomNavItem.Reservations)
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.MyCars,
+        BottomNavItem.Reservations,
+        BottomNavItem.Profile
+    )
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 

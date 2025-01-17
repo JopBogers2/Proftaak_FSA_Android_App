@@ -32,7 +32,7 @@ import com.example.rentmycar.R
 import com.example.rentmycar.components.DropdownInput
 import com.example.rentmycar.utils.Category.Companion.categories
 import com.example.rentmycar.utils.helpers.LocationHelper
-import com.example.rentmycar.viewmodel.CarFiltersViewModel
+import com.example.rentmycar.viewmodel.car.CarFiltersViewModel
 
 @Composable
 fun FilterComponent(
@@ -42,18 +42,22 @@ fun FilterComponent(
 ) {
     var isDialogOpened by rememberSaveable { mutableStateOf(false) }
 
+    //header
+    Text(
+        "Available Cars",
+        style = MaterialTheme.typography.headlineMedium,
+    )
     // Filters header
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        // Title
+        // sub heading
         Text(
             "Filters",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
         )
-
         // Button to expand the filter inputs section
         Button(onClick = { isDialogOpened = true }) {
             Icon(
