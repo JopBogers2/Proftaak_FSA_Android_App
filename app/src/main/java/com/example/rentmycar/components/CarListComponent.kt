@@ -8,7 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.responses.CarResponse
 
 @Composable
 fun CarListComponent(cars: List<CarResponse>) {

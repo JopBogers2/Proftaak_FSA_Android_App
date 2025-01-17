@@ -70,7 +70,7 @@ fun EditProfileScreen(
                 }
 
                 is ProfileViewState.Success -> {
-                    EditProfileView(state.user, viewModel, navController)
+                    EditProfileView(state.user, viewModel)
                 }
             }
         }
@@ -80,8 +80,7 @@ fun EditProfileScreen(
 @Composable
 fun EditProfileView(
     userResponse: UserResponse,
-    viewModel: ProfileViewModel,
-    navController: NavHostController
+    viewModel: ProfileViewModel
 ) {
     var showPassword by remember { mutableStateOf(false) }
 

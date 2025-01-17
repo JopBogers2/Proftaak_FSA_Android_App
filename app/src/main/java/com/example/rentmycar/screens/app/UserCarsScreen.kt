@@ -1,50 +1,60 @@
 package com.example.rentmycar.screens.app
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.rentmycar.viewmodel.UserCarsViewModel
-import com.example.rentmycar.viewmodel.UserCarsViewState
-import com.example.rentmycar.api.requests.CarDTO
-import com.example.rentmycar.api.responses.LocationResponse
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.launch
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.lazy.LazyRow
-import coil.compose.rememberImagePainter
-import com.example.rentmycar.components.ImageCarousel
-import android.content.Intent
-import android.provider.MediaStore
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.components.ImageCarousel
+import com.example.rentmycar.viewmodel.UserCarsViewModel
+import com.example.rentmycar.viewmodel.UserCarsViewState
+import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @Composable
-fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = hiltViewModel()) {
+fun UserCarsScreen(viewModel: UserCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
     val locationState by viewModel.locationState.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val refreshTrigger by viewModel.refreshTrigger.collectAsState()
-
-    var hasLocationPermission by remember {
+    val hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
                 context,
@@ -68,7 +78,8 @@ fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = 
             onClick = {
                 if (hasLocationPermission) {
                     scope.launch {
-                        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                        val fusedLocationClient =
+                            LocationServices.getFusedLocationProviderClient(context)
                         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                             if (location != null) {
                                 viewModel.setLocation(location)
@@ -86,6 +97,7 @@ fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = 
             is UserCarsViewModel.LocationState.LocationAvailable -> {
                 Text("Current Location: ${locState.location.latitude}, ${locState.location.longitude}")
             }
+
             UserCarsViewModel.LocationState.NoLocation -> {
                 Text("Location not available")
             }
@@ -97,6 +109,7 @@ fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = 
                     modifier = Modifier.padding(16.dp)
                 )
             }
+
             is UserCarsViewState.Success -> {
                 LazyColumn {
                     items(state.cars) { car ->
@@ -104,12 +117,14 @@ fun UserCarsScreen(navController: NavController, viewModel: UserCarsViewModel = 
                     }
                 }
             }
+
             is UserCarsViewState.NoCars -> {
                 Text(
                     text = "You don't have any cars registered.",
                     modifier = Modifier.padding(16.dp)
                 )
             }
+
             is UserCarsViewState.Error -> {
                 Text(
                     text = "Error: ${state.message}",
@@ -141,32 +156,32 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
     }
 
 
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            isUploading = true
-            viewModel.uploadCarImage(car.id, it) { success ->
-                if (success) {
-                    isUploading = false
-                }
-            }
-        }
-    }
-
-
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) {
-            tempImageUri?.let { uri ->
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
                 isUploading = true
-                viewModel.uploadCarImage(car.id, uri) { uploadSuccess ->
-                    if (uploadSuccess) {
+                viewModel.uploadCarImage(car.id, it) { success ->
+                    if (success) {
                         isUploading = false
                     }
                 }
             }
         }
-    }
 
 
+    val cameraLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                tempImageUri?.let { uri ->
+                    isUploading = true
+                    viewModel.uploadCarImage(car.id, uri) { uploadSuccess ->
+                        if (uploadSuccess) {
+                            isUploading = false
+                        }
+                    }
+                }
+            }
+        }
 
     Card(
         modifier = Modifier
@@ -204,16 +219,16 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-   Row {
-        Button(
-            onClick = {
-                Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
-                viewModel.addCarLocation(car.id)
-            },
-            enabled = true
-        ) {
-            Text("Add Location")
-        }
+            Row {
+                Button(
+                    onClick = {
+                        Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
+                        viewModel.addCarLocation(car.id)
+                    },
+                    enabled = true
+                ) {
+                    Text("Add Location")
+                }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
@@ -224,7 +239,7 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
         }
     }
 
-  if (showDialog) {
+    if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Upload Image") },
@@ -232,10 +247,15 @@ fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
             confirmButton = {
                 Button(onClick = {
                     showDialog = false
-                    val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                    val timeStamp: String =
+                        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                     val storageDir: File? = context.getExternalFilesDir(null)
                     val tempFile = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
-                    val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", tempFile)
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.fileprovider",
+                        tempFile
+                    )
                     tempImageUri = uri
                     cameraLauncher.launch(uri)
                 }) {
