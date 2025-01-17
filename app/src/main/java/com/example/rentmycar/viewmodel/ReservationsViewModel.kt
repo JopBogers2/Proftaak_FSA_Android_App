@@ -35,6 +35,7 @@ class ReservationsViewModel @Inject constructor(
         viewModelScope.launch {
             _viewState.update { ReservationViewState.Loading }
             try {
+                reservedTimeslots.clear()
                 // Fetch user reservations, and retrieve associated timeslots.
                 apiCallHandler.makeApiCall {
                     apiService.getUserReservations()
