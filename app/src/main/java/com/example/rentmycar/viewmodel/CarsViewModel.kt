@@ -3,7 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.ApiCallHandler
 import com.example.rentmycar.api.ApiService
-import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.responses.CarResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.ApiCallHandler
 import com.example.rentmycar.api.ApiService
-import com.example.rentmycar.api.requests.CarLocationResponse
-import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.responses.CarLocationResponse
+import com.example.rentmycar.api.responses.CarResponse
 import com.example.rentmycar.exceptions.ApiException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
