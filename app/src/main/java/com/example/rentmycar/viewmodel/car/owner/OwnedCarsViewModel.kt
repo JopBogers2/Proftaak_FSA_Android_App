@@ -1,16 +1,14 @@
-package com.example.rentmycar.viewmodel
+package com.example.rentmycar.viewmodel.car.owner
 
 import android.content.Context
 import android.location.Location
 import android.net.Uri
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.api.requests.LocationRequest
-import com.example.rentmycar.api.responses.LocationResponse
 import com.example.rentmycar.repository.CarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,14 +23,11 @@ import java.io.FileOutputStream
 import kotlinx.coroutines.withContext
 import com.google.android.gms.location.LocationServices
 
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import android.os.Looper
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 
 @HiltViewModel
-class UserCarsViewModel @Inject constructor(
+class OwnedCarsViewModel @Inject constructor(
     private val carRepository: CarRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -44,8 +39,6 @@ class UserCarsViewModel @Inject constructor(
     val locationState: StateFlow<LocationState> = _locationState
 
      private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
-
 
     fun getUserCars() {
         viewModelScope.launch {
@@ -75,6 +68,7 @@ class UserCarsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val cancellationTokenSource = CancellationTokenSource()
+
                 fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
                     .addOnSuccessListener { location ->
                         if (location != null) {
@@ -89,21 +83,25 @@ class UserCarsViewModel @Inject constructor(
                                     refreshCarList()
                                 }.onFailure { error ->
                                     Log.e("UserCarsViewModel", "Failed to add location for car $carId", error)
-                                    _viewState.value = UserCarsViewState.Error("Failed to add location: ${error.message}")
+                                    _viewState.value =
+                                        UserCarsViewState.Error("Failed to add location: ${error.message}")
                                 }
                             }
                         } else {
                             Log.e("UserCarsViewModel", "Location is null")
-                            _viewState.value = UserCarsViewState.Error("Failed to get current location")
+                            _viewState.value =
+                                UserCarsViewState.Error("Failed to get current location")
                         }
                     }
                     .addOnFailureListener { e ->
                         Log.e("UserCarsViewModel", "Error getting location", e)
-                        _viewState.value = UserCarsViewState.Error("Error getting location: ${e.message}")
+                        _viewState.value =
+                            UserCarsViewState.Error("Error getting location: ${e.message}")
                     }
             } catch (e: Exception) {
                 Log.e("UserCarsViewModel", "Error in addCarLocation", e)
-                _viewState.value = UserCarsViewState.Error("Error adding car location: ${e.message}")
+                _viewState.value =
+                    UserCarsViewState.Error("Error adding car location: ${e.message}")
             }
         }
     }
@@ -117,7 +115,6 @@ class UserCarsViewModel @Inject constructor(
 
 private val _carImages = MutableStateFlow<Map<Int, List<String>>>(emptyMap())
 val carImages: StateFlow<Map<Int, List<String>>> = _carImages
-
 
 fun uploadCarImage(carId: Int, imageUri: Uri, onComplete: (Boolean) -> Unit) {
     viewModelScope.launch {
@@ -134,7 +131,8 @@ fun uploadCarImage(carId: Int, imageUri: Uri, onComplete: (Boolean) -> Unit) {
                     onComplete(true)
                 }.onFailure { error ->
                     Log.e("UserCarsViewModel", "Failed to upload image", error)
-                    _viewState.value = UserCarsViewState.Error("Failed to upload image: ${error.message}")
+                    _viewState.value =
+                        UserCarsViewState.Error("Failed to upload image: ${error.message}")
                     onComplete(false)
                 }
             } else {
@@ -198,11 +196,13 @@ fun getImagesByCar(carId: Int) {
             }.onFailure { error ->
                 Log.e("UserCarsViewModel", "Error fetching images for car $carId: ${error.message}", error)
 
-                _viewState.value = UserCarsViewState.Error("Failed to fetch images for car $carId: ${error.message}")
+                _viewState.value =
+                    UserCarsViewState.Error("Failed to fetch images for car $carId: ${error.message}")
             }
         } catch (e: Exception) {
             Log.e("UserCarsViewModel", "Exception in getImagesByCar for car $carId", e)
-            _viewState.value = UserCarsViewState.Error("Exception fetching images for car $carId: ${e.message}")
+            _viewState.value =
+                UserCarsViewState.Error("Exception fetching images for car $carId: ${e.message}")
         }
     }
 }
@@ -216,7 +216,7 @@ fun getImagesByCar(carId: Int) {
 
 sealed class UserCarsViewState {
     object Loading : UserCarsViewState()
-    data class Success(val cars: List<CarDTO>) : UserCarsViewState()
+    data class Success(val cars: List<OwnedCarResponse>) : UserCarsViewState()
     object NoCars : UserCarsViewState()
     data class Error(val message: String) : UserCarsViewState()
 }

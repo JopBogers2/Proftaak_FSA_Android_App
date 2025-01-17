@@ -1,4 +1,4 @@
-package com.example.rentmycar.screens.app
+package com.example.rentmycar.screens.app.car
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.components.ImageCarousel
-import com.example.rentmycar.viewmodel.UserCarsViewModel
-import com.example.rentmycar.viewmodel.UserCarsViewState
+import com.example.rentmycar.viewmodel.car.owner.OwnedCarsViewModel
+import com.example.rentmycar.viewmodel.car.owner.UserCarsViewState
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 import java.io.File
@@ -48,7 +48,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun UserCarsScreen(viewModel: UserCarsViewModel = hiltViewModel()) {
+fun UserCarsScreen(viewModel: OwnedCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
     val locationState by viewModel.locationState.collectAsState()
     val context = LocalContext.current
@@ -94,11 +94,11 @@ fun UserCarsScreen(viewModel: UserCarsViewModel = hiltViewModel()) {
         }
 
         when (val locState = locationState) {
-            is UserCarsViewModel.LocationState.LocationAvailable -> {
+            is OwnedCarsViewModel.LocationState.LocationAvailable -> {
                 Text("Current Location: ${locState.location.latitude}, ${locState.location.longitude}")
             }
 
-            UserCarsViewModel.LocationState.NoLocation -> {
+            OwnedCarsViewModel.LocationState.NoLocation -> {
                 Text("Location not available")
             }
         }
@@ -137,7 +137,7 @@ fun UserCarsScreen(viewModel: UserCarsViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun CarItem(car: CarDTO, viewModel: UserCarsViewModel) {
+fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
     val context = LocalContext.current
     val carImages by viewModel.carImages.collectAsState()
 

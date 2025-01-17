@@ -1,4 +1,4 @@
-package com.example.rentmycar.viewmodel
+package com.example.rentmycar.viewmodel.car
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

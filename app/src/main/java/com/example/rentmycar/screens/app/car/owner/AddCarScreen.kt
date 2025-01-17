@@ -1,4 +1,4 @@
-package com.example.rentmycar.screens.app
+package com.example.rentmycar.screens.app.car.owner
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
@@ -24,15 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.rentmycar.api.requests.RegisterCarRequest
-import com.example.rentmycar.viewmodel.DataLoadingState
-import com.example.rentmycar.viewmodel.MyCarViewModel
-import com.example.rentmycar.viewmodel.RegistrationState
-
+import com.example.rentmycar.viewmodel.car.owner.DataLoadingState
+import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
+import com.example.rentmycar.viewmodel.car.owner.RegistrationState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCarScreen(
-    viewModel: MyCarViewModel = hiltViewModel()
+    viewModel: OwnedCarViewModel = hiltViewModel()
 ) {
     val registrationState by viewModel.registrationState.collectAsState()
     val brands by viewModel.brands.collectAsState()
@@ -57,10 +56,6 @@ fun AddCarScreen(
     var expandedFuelType by remember { mutableStateOf(false) }
     val transmissionOptions = listOf("AUTOMATIC", "MANUAL")
     val fuelTypeOptions = listOf("DIESEL", "PETROL", "GAS", "ELECTRIC", "HYDROGEN")
-
-
-
-
 
 LaunchedEffect(registrationState) {
     Log.d("AddCarScreen", "Registration state changed: $registrationState")

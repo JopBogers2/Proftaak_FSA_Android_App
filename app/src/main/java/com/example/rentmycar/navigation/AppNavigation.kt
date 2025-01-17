@@ -10,14 +10,14 @@ import androidx.navigation.navArgument
 import com.example.rentmycar.screens.app.HomeScreen
 import com.example.rentmycar.screens.app.ProfileScreen
 import com.example.rentmycar.PreferencesManager
-import com.example.rentmycar.screens.app.AddCarScreen
-import com.example.rentmycar.screens.app.CarItemScreen
+import com.example.rentmycar.screens.app.car.owner.AddCarScreen
+import com.example.rentmycar.screens.app.car.CarItemScreen
 import com.example.rentmycar.screens.app.DirectionScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
 import com.example.rentmycar.screens.app.ReservationsScreen
 import com.example.rentmycar.screens.app.AvailableTimeslotsScreen
-import com.example.rentmycar.screens.app.MyCarsScreen
-import com.example.rentmycar.screens.app.UserCarsScreen
+import com.example.rentmycar.screens.app.car.owner.MyCarsScreen
+import com.example.rentmycar.screens.app.car.UserCarsScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
 

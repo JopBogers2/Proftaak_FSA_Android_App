@@ -1,4 +1,4 @@
-package com.example.rentmycar.screens.app
+package com.example.rentmycar.screens.app.car.owner
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column

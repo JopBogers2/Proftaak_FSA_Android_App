@@ -1,10 +1,10 @@
-package com.example.rentmycar.viewmodel
+package com.example.rentmycar.viewmodel.car.owner
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rentmycar.api.requests.BrandDTO
-import com.example.rentmycar.api.requests.CarDTO
-import com.example.rentmycar.api.requests.ModelDTO
+import com.example.rentmycar.api.responses.BrandResponse
+import com.example.rentmycar.api.responses.OwnedCarResponse
+import com.example.rentmycar.api.responses.ModelResponse
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.repository.CarRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,20 +18,20 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MyCarViewModel @Inject constructor(
+class OwnedCarViewModel @Inject constructor(
     private val carRepository: CarRepository
 ) : ViewModel() {
     private val _registrationState = MutableStateFlow<RegistrationState>(RegistrationState.Idle)
     val registrationState: StateFlow<RegistrationState> = _registrationState
 
-    private val _viewState = MutableStateFlow<MyCarViewState>(MyCarViewState.Loading)
-    val viewState: StateFlow<MyCarViewState> = _viewState
+    private val _viewState = MutableStateFlow<OwnedCarViewState>(OwnedCarViewState.Loading)
+    val viewState: StateFlow<OwnedCarViewState> = _viewState
 
-    private val _brands = MutableStateFlow<List<BrandDTO>>(emptyList())
-    val brands: StateFlow<List<BrandDTO>> = _brands.asStateFlow()
+    private val _brands = MutableStateFlow<List<BrandResponse>>(emptyList())
+    val brands: StateFlow<List<BrandResponse>> = _brands.asStateFlow()
 
-    private val _models = MutableStateFlow<List<ModelDTO>>(emptyList())
-    val models: StateFlow<List<ModelDTO>> = _models.asStateFlow()
+    private val _models = MutableStateFlow<List<ModelResponse>>(emptyList())
+    val models: StateFlow<List<ModelResponse>> = _models.asStateFlow()
 
     private val _selectedBrandId = MutableStateFlow<Int?>(null)
     val selectedBrandId: StateFlow<Int?> = _selectedBrandId.asStateFlow()
@@ -39,22 +39,20 @@ class MyCarViewModel @Inject constructor(
     private val _selectedModelId = MutableStateFlow<Int?>(null)
     val selectedModelId: StateFlow<Int?> = _selectedModelId.asStateFlow()
 
-    val selectedBrand: StateFlow<BrandDTO?> = _selectedBrandId.map { brandId ->
+    val selectedBrand: StateFlow<BrandResponse?> = _selectedBrandId.map { brandId ->
         _brands.value.find { it.id == brandId }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    val selectedModel: StateFlow<ModelDTO?> = _selectedModelId.map { modelId ->
+    val selectedModel: StateFlow<ModelResponse?> = _selectedModelId.map { modelId ->
         _models.value.find { it.id == modelId }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     private val _dataLoadingState = MutableStateFlow<DataLoadingState>(DataLoadingState.Initial)
     val dataLoadingState: StateFlow<DataLoadingState> = _dataLoadingState
 
-
     init {
         fetchBrands()
     }
-
 
     fun fetchBrands() {
         viewModelScope.launch {
@@ -137,10 +135,10 @@ class MyCarViewModel @Inject constructor(
     }
 }
 
-sealed class MyCarViewState {
-    data object Loading : MyCarViewState()
-    data class Success(val cars: List<CarDTO>) : MyCarViewState()
-    data class Error(val message: String) : MyCarViewState()
+sealed class OwnedCarViewState {
+    data object Loading : OwnedCarViewState()
+    data class Success(val cars: List<OwnedCarResponse>) : OwnedCarViewState()
+    data class Error(val message: String) : OwnedCarViewState()
 }
 
 sealed class RegistrationState {

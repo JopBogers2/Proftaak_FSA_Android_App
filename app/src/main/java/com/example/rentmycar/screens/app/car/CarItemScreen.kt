@@ -1,4 +1,4 @@
-package com.example.rentmycar.screens.app
+package com.example.rentmycar.screens.app.car
 
 import android.content.Context
 import android.widget.Toast
@@ -38,9 +38,10 @@ import com.example.rentmycar.api.responses.CarResponse
 import com.example.rentmycar.components.ExpandableCard
 import com.example.rentmycar.components.ImageCarousel
 import com.example.rentmycar.components.car.SpecificationRow
+import com.example.rentmycar.screens.app.AuthenticatedScreen
 import com.example.rentmycar.utils.helpers.LocationHelper
 import com.example.rentmycar.utils.helpers.RedirectHelper
-import com.example.rentmycar.viewmodel.CarViewModel
+import com.example.rentmycar.viewmodel.car.CarViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng

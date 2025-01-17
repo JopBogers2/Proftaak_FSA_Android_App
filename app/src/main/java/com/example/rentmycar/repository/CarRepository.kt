@@ -2,10 +2,10 @@ package com.example.rentmycar.repository
 
 import android.util.Log
 import com.example.rentmycar.api.ApiService
-import com.example.rentmycar.api.requests.BrandDTO
-import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.api.responses.BrandResponse
+import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.api.requests.LocationRequest
-import com.example.rentmycar.api.requests.ModelDTO
+import com.example.rentmycar.api.responses.ModelResponse
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 
 class CarRepository @Inject constructor(private val apiService: ApiService) {
-    suspend fun getOwnerCars(): List<CarDTO> {
+    suspend fun getOwnerCars(): List<OwnedCarResponse> {
         val response = apiService.getOwnerCars()
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
@@ -110,7 +110,7 @@ class CarRepository @Inject constructor(private val apiService: ApiService) {
         }
     }
 
-    suspend fun getBrands(): List<BrandDTO>? {
+    suspend fun getBrands(): List<BrandResponse>? {
         return try {
             val response = apiService.getBrands()
             if (response.isSuccessful) {
@@ -128,7 +128,7 @@ class CarRepository @Inject constructor(private val apiService: ApiService) {
         }
     }
 
-    suspend fun getModelsByBrand(brandId: Int): List<ModelDTO>? {
+    suspend fun getModelsByBrand(brandId: Int): List<ModelResponse>? {
         return try {
             val response = apiService.getModelsByBrand(brandId)
             if (response.isSuccessful) {

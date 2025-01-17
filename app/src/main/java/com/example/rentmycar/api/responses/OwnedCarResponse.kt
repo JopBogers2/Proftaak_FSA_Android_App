@@ -1,6 +1,6 @@
-package com.example.rentmycar.api.requests
+package com.example.rentmycar.api.responses
 
-data class CarDTO(
+data class OwnedCarResponse(
     val id: Int,
     val ownerId: Int,
     val locationId: Int?,
@@ -12,5 +12,4 @@ data class CarDTO(
     val transmission: String,
     val price: Double,
     val category: String,
-
 )

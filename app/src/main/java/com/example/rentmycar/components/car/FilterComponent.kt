@@ -32,7 +32,7 @@ import com.example.rentmycar.R
 import com.example.rentmycar.components.DropdownInput
 import com.example.rentmycar.utils.Category.Companion.categories
 import com.example.rentmycar.utils.helpers.LocationHelper
-import com.example.rentmycar.viewmodel.CarFiltersViewModel
+import com.example.rentmycar.viewmodel.car.CarFiltersViewModel
 
 @Composable
 fun FilterComponent(

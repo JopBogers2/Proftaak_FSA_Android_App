@@ -1,12 +1,12 @@
 package com.example.rentmycar.api
 
-import com.example.rentmycar.api.requests.BrandDTO
-import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.api.responses.BrandResponse
+import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.api.requests.CreateReservationRequest
 import com.example.rentmycar.api.requests.DirectionsToCarRequest
 import com.example.rentmycar.api.requests.LocationRequest
 import com.example.rentmycar.api.requests.LoginRequest
-import com.example.rentmycar.api.requests.ModelDTO
+import com.example.rentmycar.api.responses.ModelResponse
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.api.requests.RegisterRequest
 import com.example.rentmycar.api.requests.UserUpdateRequest
@@ -51,10 +51,10 @@ interface ApiService {
     suspend fun updateUser(@Body request: UserUpdateRequest): Response<MessageResponse>
 
     @GET("brand/all")
-    suspend fun getBrands(): Response<List<BrandDTO>>
+    suspend fun getBrands(): Response<List<BrandResponse>>
 
     @GET("model/brand/{brandId}")
-    suspend fun getModelsByBrand(@Path("brandId") brandId: Int): Response<List<ModelDTO>>
+    suspend fun getModelsByBrand(@Path("brandId") brandId: Int): Response<List<ModelResponse>>
 
     @POST("car/location")
     suspend fun addCarLocation(@Body request: LocationRequest): Response<Unit>
@@ -70,7 +70,7 @@ interface ApiService {
     suspend fun registerCar(@Body request: RegisterCarRequest): Response<ResponseBody>
 
     @GET("car/owner")
-    suspend fun getOwnerCars(): Response<List<CarDTO>>
+    suspend fun getOwnerCars(): Response<List<OwnedCarResponse>>
 
     @GET("car/all/filtered")
     suspend fun getFilteredCars(
