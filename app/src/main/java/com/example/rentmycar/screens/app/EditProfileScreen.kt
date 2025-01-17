@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.api.requests.UserResponse
+import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.ProfileViewModel

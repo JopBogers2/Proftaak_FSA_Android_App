@@ -1,6 +1,7 @@
 package com.example.rentmycar.api
 
 import com.example.rentmycar.BuildConfig
+import com.example.rentmycar.api.adapters.LocalDateTimeAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -9,6 +10,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 object ApiClient {
     private val moshi = Moshi.Builder()
+        .add(LocalDateTimeAdapter())
         .add(KotlinJsonAdapterFactory())
         .build()
 

@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,8 +33,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.api.requests.CarLocationResponse
-import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.responses.CarLocationResponse
+import com.example.rentmycar.api.responses.CarResponse
 import com.example.rentmycar.components.ExpandableCard
 import com.example.rentmycar.components.ImageCarousel
 import com.example.rentmycar.components.car.SpecificationRow
@@ -68,7 +68,7 @@ fun CarItemScreen(
         val imagePaths by carViewModel.images.observeAsState(emptyList())
         val carLocation by carViewModel.location.observeAsState()
 
-        Column (
+        Column(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxSize()
@@ -83,7 +83,7 @@ fun CarItemScreen(
                 contentPadding = PaddingValues(all = 0.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = "Back icon",
                 )
                 Text("Back home")
@@ -100,7 +100,7 @@ fun CarItemScreen(
             }
 
             // Section with action buttons
-            CarItemActions(car, context)
+            CarItemActions(car, context, navController)
 
             // Expanded section with the location of the car
             CarItemLocation(carLocation, context, car)
@@ -119,7 +119,9 @@ fun CarItemHeader(car: CarResponse) {
     Row(
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.padding(top = 10.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(top = 10.dp)
+            .fillMaxWidth()
     ) {
         Column {
             // Brand & model
@@ -140,7 +142,7 @@ fun CarItemHeader(car: CarResponse) {
  * Section of the page which contains Reserve & Contact action buttons
  */
 @Composable
-fun CarItemActions(car: CarResponse, context: Context) {
+fun CarItemActions(car: CarResponse, context: Context, navController: NavHostController) {
     val redirectHelper = RedirectHelper()
 
     Row(
@@ -148,8 +150,13 @@ fun CarItemActions(car: CarResponse, context: Context) {
     ) {
         // Button to reserve the car.
         Button(
-            onClick = { /* TODO */ },
-            modifier = Modifier.fillMaxSize().weight(1f).padding(end = 4.dp),
+            onClick = {
+                navController.navigate("timeslots/${car.id}")
+            },
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+                .padding(end = 4.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.DateRange,
@@ -169,7 +176,10 @@ fun CarItemActions(car: CarResponse, context: Context) {
                     }
                 )
             },
-            modifier = Modifier.fillMaxSize().weight(1f).padding(start = 4.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f)
+                .padding(start = 4.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.Email,
@@ -196,7 +206,6 @@ fun CarItemLocation(carLocation: CarLocationResponse?, context: Context, car: Ca
             carLocation.latitude,
             carLocation.longitude,
         )
-
         // Set the marker state
         val carMarkerState = rememberMarkerState(position = carLatLong)
 
@@ -208,7 +217,10 @@ fun CarItemLocation(carLocation: CarLocationResponse?, context: Context, car: Ca
         // Display the location
         ExpandableCard(title = "Location") {
             Row(
-                modifier = Modifier.fillMaxWidth().height(280.dp).padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(16.dp)
             ) {
                 GoogleMap(
                     modifier = Modifier.fillMaxSize(),

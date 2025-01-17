@@ -1,30 +1,35 @@
 package com.example.rentmycar.api
 
 import com.example.rentmycar.api.requests.BrandDTO
-import com.example.rentmycar.api.requests.CarResponse
+import com.example.rentmycar.api.requests.CarDTO
+import com.example.rentmycar.api.requests.CreateReservationRequest
+import com.example.rentmycar.api.requests.DirectionsToCarRequest
 import com.example.rentmycar.api.requests.LocationRequest
 import com.example.rentmycar.api.requests.LoginRequest
-import com.example.rentmycar.api.requests.MessageResponse
 import com.example.rentmycar.api.requests.ModelDTO
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.api.requests.RegisterRequest
-import com.example.rentmycar.api.requests.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
 import com.example.rentmycar.api.responses.AuthResponse
+import com.example.rentmycar.api.responses.CarLocationResponse
+import com.example.rentmycar.api.responses.CarResponse
+import com.example.rentmycar.api.responses.DirectionsToCarResponse
 import com.example.rentmycar.api.responses.LocationResponse
-import com.example.rentmycar.api.requests.CarDTO
-import com.example.rentmycar.api.requests.CarLocationResponse
-import okhttp3.ResponseBody
+import com.example.rentmycar.api.responses.MessageResponse
+import com.example.rentmycar.api.responses.ReservationResponse
+import com.example.rentmycar.api.responses.TimeslotResponse
+import com.example.rentmycar.api.responses.UserResponse
 import okhttp3.MultipartBody
-import retrofit2.http.*
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
-import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
 interface ApiService {
@@ -94,4 +99,39 @@ interface ApiService {
     suspend fun getLocationByCar(
         @Path("id") carId: Int,
     ): Response<CarLocationResponse>
+
+    @POST("car/directions")
+    suspend fun getDirectionsToCar(@Body request: DirectionsToCarRequest)
+            : Response<DirectionsToCarResponse>
+
+    @GET("reservation/user")
+    suspend fun getUserReservations(): Response<List<ReservationResponse>>
+
+    @GET("/reservation/timeslot/{id}")
+    suspend fun getTimeslotReservation(
+        @Path("id") timeSlotId: Int,
+    ): Response<ReservationResponse>
+
+
+    @POST("/reservation/create")
+    suspend fun createReservation(
+        @Body request: CreateReservationRequest
+    ): Response<MessageResponse>
+
+
+    @DELETE("/reservation/{id}")
+    suspend fun cancelReservation(
+        @Path("id") reservationId: Int,
+    ): Response<MessageResponse>
+
+
+    @GET("timeSlot/{id}")
+    suspend fun getTimeslotById(
+        @Path("id") timeSlotId: Int,
+    ): Response<TimeslotResponse>
+
+    @GET("timeSlot/car/{id}")
+    suspend fun getTimeslotsByCarId(
+        @Path("id") timeSlotId: Int,
+    ): Response<List<TimeslotResponse>>
 }
