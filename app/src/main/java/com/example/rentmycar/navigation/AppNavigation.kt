@@ -16,8 +16,7 @@ import com.example.rentmycar.screens.app.DirectionScreen
 import com.example.rentmycar.screens.app.EditProfileScreen
 import com.example.rentmycar.screens.app.ReservationsScreen
 import com.example.rentmycar.screens.app.AvailableTimeslotsScreen
-import com.example.rentmycar.screens.app.car.owner.MyCarsScreen
-import com.example.rentmycar.screens.app.car.UserCarsScreen
+import com.example.rentmycar.screens.app.car.owner.OwnedCarsScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
 
@@ -32,8 +31,8 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         composable(BottomNavItem.Profile.route) { ProfileScreen(navController) }
         composable(BottomNavItem.Reservations.route) { ReservationsScreen(navController) }
         composable(AppNavItem.EditProfile.route) { EditProfileScreen(navController) }
-        composable(BottomNavItem.MyCars.route) { MyCarsScreen(navController) }
-        composable(AppNavItem.UserCars.route) { UserCarsScreen() }
+        composable(BottomNavItem.MyCars.route) { OwnedCarsScreen(navController) }
+        composable(AppNavItem.UserCars.route) { OwnedCarsScreen(navController) }
         composable(AppNavItem.AddCar.route) { AddCarScreen() }
 
         composable("carItem/{carId}", arguments = listOf(

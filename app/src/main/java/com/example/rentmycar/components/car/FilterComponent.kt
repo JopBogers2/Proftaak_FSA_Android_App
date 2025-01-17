@@ -42,18 +42,22 @@ fun FilterComponent(
 ) {
     var isDialogOpened by rememberSaveable { mutableStateOf(false) }
 
+    //header
+    Text(
+        "Available Cars",
+        style = MaterialTheme.typography.headlineMedium,
+    )
     // Filters header
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        // Title
+        // sub heading
         Text(
             "Filters",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
         )
-
         // Button to expand the filter inputs section
         Button(onClick = { isDialogOpened = true }) {
             Icon(

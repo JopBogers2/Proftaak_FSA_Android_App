@@ -1,14 +1,14 @@
-package com.example.rentmycar.screens.app.car
+package com.example.rentmycar.screens.app.car.owner
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,10 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,78 +29,67 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.OwnedCarResponse
+import com.example.rentmycar.components.ExpandableCard
 import com.example.rentmycar.components.ImageCarousel
+import com.example.rentmycar.components.car.SpecificationRow
+import com.example.rentmycar.navigation.AppNavItem
 import com.example.rentmycar.viewmodel.car.owner.OwnedCarsViewModel
 import com.example.rentmycar.viewmodel.car.owner.UserCarsViewState
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun UserCarsScreen(viewModel: OwnedCarsViewModel = hiltViewModel()) {
+fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
-    val locationState by viewModel.locationState.collectAsState()
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    val hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
 
     LaunchedEffect(Unit) {
         viewModel.getUserCars()
     }
 
-    Column {
-        Text(
-            text = "My Cars",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        Button(
-            onClick = {
-                if (hasLocationPermission) {
-                    scope.launch {
-                        val fusedLocationClient =
-                            LocationServices.getFusedLocationProviderClient(context)
-                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                            if (location != null) {
-                                viewModel.setLocation(location)
-                            }
-                        }
-                    }
-                }
-            },
-            enabled = hasLocationPermission
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Text("Fetch Current Location")
-        }
+            // Title
+            Text(
+                "My Cars",
+                style = MaterialTheme.typography.headlineMedium,
+            )
 
-        when (val locState = locationState) {
-            is OwnedCarsViewModel.LocationState.LocationAvailable -> {
-                Text("Current Location: ${locState.location.latitude}, ${locState.location.longitude}")
-            }
-
-            OwnedCarsViewModel.LocationState.NoLocation -> {
-                Text("Location not available")
+            // Button to expand the filter inputs section
+            Button(onClick = {
+                try {
+                    navController.navigate(AppNavItem.AddCar.route)
+                } catch (e: Exception) {
+                    Log.e("Navigation", "Error navigating to AddCar: ${e.message}", e)
+                }
+            }) {
+                Icon(
+                    painter = painterResource(R.drawable.add),
+                    contentDescription = "Add icon",
+                    modifier = Modifier.padding(end = 4.dp),
+                )
+                Text("Add Car")
             }
         }
 
@@ -155,7 +145,6 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
         }
     }
 
-
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
@@ -167,7 +156,6 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
                 }
             }
         }
-
 
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -183,41 +171,42 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
             }
         }
 
-    Card(
+    OutlinedCard(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text(text = "Model: ${car.model}", style = MaterialTheme.typography.titleMedium)
-            Text(text = "License Plate: ${car.licensePlate}")
-            Text(text = "Year: ${car.year}")
-            Text(text = "Color: ${car.color}")
-            Text(text = "Fuel: ${car.fuel}")
-            Text(text = "Transmission: ${car.transmission}")
-            Text(text = "Price: ${car.price}")
-            Text(text = "Category: ${car.category}")
+            Text("Model: ${car.model}", style = MaterialTheme.typography.titleMedium)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ExpandableCard(title = "Images") {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    val images = carImages[car.id] ?: emptyList()
+                    if (images.isNotEmpty()) {
+                        ImageCarousel(images, context)
+                    } else {
+                        Text("No images available")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            CarInfo(car)
 
             if (car.locationId != null) {
                 Text(text = "Location ID: ${car.locationId}")
             } else {
                 Text(text = "Location: Not available")
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            val images = carImages[car.id] ?: emptyList()
-            if (images.isNotEmpty()) {
-                ImageCarousel(images, context)
-            } else {
-                Text("No images available")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Row {
                 Button(
@@ -271,5 +260,17 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
                 }
             }
         )
+    }
+}
+
+@Composable
+fun CarInfo(car: OwnedCarResponse) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        SpecificationRow("Model", car.model)
+        SpecificationRow("Category", car.category)
+        SpecificationRow("Fuel", car.fuel)
+        SpecificationRow("Transmission", car.transmission)
+        SpecificationRow("Color", car.color)
+        SpecificationRow("License plate", car.licensePlate)
     }
 }
