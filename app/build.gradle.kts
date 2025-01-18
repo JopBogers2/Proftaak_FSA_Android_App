@@ -44,6 +44,14 @@ android {
         buildConfig = true
         compose = true
     }
+
+
+    packaging {
+        resources {
+            excludes.add("META-INF/LICENSE.md")
+            excludes.add("META-INF/LICENSE-notice.md")
+        }
+    }
 }
 
 dependencies {
@@ -54,7 +62,17 @@ dependencies {
     implementation(libs.converter.kotlinx.serialization.vlatestversion)
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
+    implementation(libs.kotlin.mockito.kotlin)
+    implementation(libs.androidx.navigation.testing)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.google.truth)
+    implementation(libs.mockk.android)
+    implementation(libs.hilt.android.testing)
+    testImplementation(libs.junit.jupiter)
+    androidTestImplementation(libs.junit.jupiter)
     kapt(libs.hilt.android.compiler)
+    androidTestImplementation(libs.androidx.rules)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.hilt.navigation.compose)
@@ -75,10 +93,14 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 //
