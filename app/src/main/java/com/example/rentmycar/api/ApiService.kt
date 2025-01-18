@@ -9,6 +9,7 @@ import com.example.rentmycar.api.requests.LoginRequest
 import com.example.rentmycar.api.responses.ModelResponse
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.api.requests.RegisterRequest
+import com.example.rentmycar.api.requests.UpdateCarRequest
 import com.example.rentmycar.api.requests.UserUpdateRequest
 
 import com.example.rentmycar.api.responses.AuthResponse
@@ -68,6 +69,10 @@ interface ApiService {
 
     @POST("car/register")
     suspend fun registerCar(@Body request: RegisterCarRequest): Response<ResponseBody>
+
+
+    @PUT("car/update")
+    suspend fun updateCar(@Body request: UpdateCarRequest): Response<ResponseBody>
 
     @GET("car/owner")
     suspend fun getOwnerCars(): Response<List<OwnedCarResponse>>

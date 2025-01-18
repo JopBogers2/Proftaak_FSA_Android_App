@@ -6,6 +6,7 @@ import com.example.rentmycar.api.responses.BrandResponse
 import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.api.requests.LocationRequest
 import com.example.rentmycar.api.responses.ModelResponse
+import com.example.rentmycar.api.requests.UpdateCarRequest
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -24,6 +25,8 @@ class CarRepository @Inject constructor(private val apiService: ApiService) {
             throw Exception("Failed to fetch owner cars: ${response.errorBody()?.string()}")
         }
     }
+
+
 
     suspend fun getImagesByCar(carId: Int): Result<List<String>> {
         return try {
@@ -88,6 +91,30 @@ class CarRepository @Inject constructor(private val apiService: ApiService) {
             Result.failure(e)
         }
     }
+
+
+
+
+suspend fun updateCar(request: UpdateCarRequest): Result<Unit> {
+    return try {
+        Log.d("CarRepository", "Updating car, Request: $request")
+        val response = apiService.updateCar(request)
+        Log.d("CarRepository", "Response code: ${response.code()}")
+        Log.d("CarRepository", "Response headers: ${response.headers()}")
+        if (response.isSuccessful) {
+            Log.d("CarRepository", "Car updated successfully")
+            Result.success(Unit)
+        } else {
+            val errorBody = response.errorBody()?.string()
+            val errorCode = response.code()
+            Log.e("CarRepository", "Failed to update car. Status: $errorCode, Error: $errorBody")
+            Result.failure(Exception("Failed to update car. Status: $errorCode, Error: $errorBody"))
+        }
+    } catch (e: Exception) {
+        Log.e("CarRepository", "Exception when updating car", e)
+        Result.failure(Exception("Exception when updating car: ${e.message}", e))
+    }
+}
 
     suspend fun addCarLocation(locationRequest: LocationRequest): Result<Unit> {
         return try {
