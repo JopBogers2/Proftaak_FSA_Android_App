@@ -64,4 +64,24 @@
     <string name="contact_owner">Neem contact op met de eigenaar</string>
     <string name="email_icon">E-mailicoon</string>
     <string name="by">%1$s, %2$s door @%3$s</string>
+    <string name="available_cars">Beschikbare Autos</string>
+    <string name="filters">Filters</string>
+    <string name="add_filters">Filter toevoegen</string>
+    <string name="add_icon">toevoegen icoon</string>
+    <string name="close_icon">sluiten icoon</string>
+    <string name="hide_filters">Verberg</string>
+    <string name="FilterCategory">Categorie</string>
+    <string name="FilterPrice">Prijs</string>
+    <string name="radius">Radius</string>
+    <string name="apply_filters">Filteren</string>
+    <string name="CarOwner">Eigenaar: @%1$s</string>
+    <string name="car_image">Auto foto</string>
+    <string name="car_image_placeholder">Auto placeholder</string>
+    <string name="reservation">Reservatie</string>
+    <string name="from">Van: %1$s</string>
+    <string name="until">Tot: %1$s</string>
+    <string name="route_to_car">Route naar auto</string>
+    <string name="timeslot">Tijdslot</string>
+    <string name="reserve">Reserveer</string>
+    <string name="home">Start</string>
 </resources>

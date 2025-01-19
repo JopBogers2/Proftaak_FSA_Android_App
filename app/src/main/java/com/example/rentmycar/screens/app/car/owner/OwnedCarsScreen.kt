@@ -238,7 +238,10 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                 .padding(16.dp)
         ) {
 
-            Text("Brand: ${car.brand}", style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(R.string.no_images_available) + ": ${car.brand}",
+                style = MaterialTheme.typography.titleMedium
+            )
             Text(" ${car.model}", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -364,13 +367,21 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
             editingField = null
             carUpdateViewModel.updateCar(editedCar)
         }
-        EditableField(stringResource(R.string.color), currentCar.color, editingField == "color") { newValue ->
+        EditableField(
+            stringResource(R.string.color),
+            currentCar.color,
+            editingField == "color"
+        ) { newValue ->
             editedCar = editedCar.copy(color = newValue)
             editingField = null
             carUpdateViewModel.updateCar(editedCar)
         }
 
-        EditableField(stringResource(R.string.fuel), currentCar.price.toString(), editingField == "price") { newValue ->
+        EditableField(
+            stringResource(R.string.fuel),
+            currentCar.price.toString(),
+            editingField == "price"
+        ) { newValue ->
             val newPrice = newValue.toDoubleOrNull()
             if (newPrice != null) {
                 editedCar = editedCar.copy(price = newPrice)
@@ -379,7 +390,11 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
             }
         }
 
-        EditableField(stringResource(R.string.year), currentCar.year.toString(), editingField == "year") { newValue ->
+        EditableField(
+            stringResource(R.string.year),
+            currentCar.year.toString(),
+            editingField == "year"
+        ) { newValue ->
             val newYear = newValue.toIntOrNull()
             if (newYear != null) {
                 editedCar = editedCar.copy(year = newYear)

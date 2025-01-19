@@ -68,7 +68,7 @@ fun AddCarScreen(
         when (registrationState) {
             is RegistrationState.Success -> {
                 isCarAdded = true
-                errorMessage = "Car added successfully!"
+                errorMessage = R.string.car_added_successfully.toString()
                 onCarAdded()
                 delay(2000)
                 onDismiss()
@@ -232,7 +232,7 @@ fun AddCarScreen(
                         viewModel.registerCar(carRequest) { carId ->
                             if (carId != null) {
                                 isCarAdded = true
-                                errorMessage = "Car added successfully with ID: $carId"
+                                errorMessage = "Car added successfully with ID: ${carId}"
 
                                 licensePlate = ""
                                 year = ""

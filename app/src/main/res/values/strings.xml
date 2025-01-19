@@ -64,4 +64,24 @@
     <string name="contact_owner">Contact owner</string>
     <string name="email_icon">Email icon</string>
     <string name="by">%1$s, %2$s by @%3$s</string>
+    <string name="available_cars">Available Cars</string>
+    <string name="filters">Filters</string>
+    <string name="add_filters">Add filters</string>
+    <string name="add_icon">Add icon</string>
+    <string name="close_icon">Close icon</string>
+    <string name="hide_filters">Hide filters</string>
+    <string name="FilterCategory">Category</string>
+    <string name="FilterPrice">Price</string>
+    <string name="radius">Radius</string>
+    <string name="apply_filters">Apply filters</string>
+    <string name="CarOwner">Owner: @%1$s</string>
+    <string name="car_image">Car image</string>
+    <string name="car_image_placeholder">Car image placeholder</string>
+    <string name="reservation">Reservation</string>
+    <string name="from">From: %1$s</string>
+    <string name="until">Until: %1$s</string>
+    <string name="route_to_car">Route to car</string>
+    <string name="timeslot">Timeslot</string>
+    <string name="reserve">Reserve</string>
+    <string name="home">Home</string>
 </resources>

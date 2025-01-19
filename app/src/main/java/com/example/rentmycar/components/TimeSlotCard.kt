@@ -17,8 +17,10 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.TimeslotResponse
 import com.example.rentmycar.viewmodel.TimeslotsViewModel
 
@@ -48,15 +50,15 @@ fun TimeSlotCard(timeslot: TimeslotResponse) {
                     .fillMaxWidth(),
             ) {
                 Text(
-                    "Timeslot",
+                    stringResource(R.string.timeslot),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "From: ${timeslot.availableFrom}",
+                    stringResource(R.string.from, timeslot.availableFrom),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    "Until: ${timeslot.availableUntil}",
+                    stringResource(R.string.until, timeslot.availableUntil),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -74,7 +76,7 @@ fun TimeSlotCard(timeslot: TimeslotResponse) {
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "route icon",
                         )
-                        Text("Reserve")
+                        Text(stringResource(R.string.reserve))
                     }
                 }
             }
