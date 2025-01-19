@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -76,7 +78,6 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
                 style = MaterialTheme.typography.headlineMedium,
             )
 
-            // Button to expand the filter inputs section
             Button(onClick = {
                 try {
                     navController.navigate(AppNavItem.AddCar.route)
@@ -103,7 +104,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             is UserCarsViewState.Success -> {
                 LazyColumn {
                     items(state.cars) { car ->
-                        CarItem(car, viewModel)
+                        CarItem(navController, car, viewModel)
                     }
                 }
             }
@@ -127,7 +128,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
 }
 
 @Composable
-fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
+fun CarItem(navController: NavController, car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
     val context = LocalContext.current
     val carImages by viewModel.carImages.collectAsState()
 
@@ -181,14 +182,20 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             Text("Model: ${car.model}", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            if (car.locationId != null) {
+                Text(text = "Location: Location set")
+            } else {
+                Text(text = "Location: No Location set")
+            }
+
             ExpandableCard(title = "Images") {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column {
                     val images = carImages[car.id] ?: emptyList()
                     if (images.isNotEmpty()) {
                         ImageCarousel(images, context)
@@ -198,32 +205,48 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            CarInfo(car)
-
-            if (car.locationId != null) {
-                Text(text = "Location ID: ${car.locationId}")
-            } else {
-                Text(text = "Location: Not available")
+            ExpandableCard(title = "Car details") {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    CarInfo(car)
+                }
             }
 
-            Row {
-                Button(
-                    onClick = {
-                        Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
-                        viewModel.addCarLocation(car.id)
-                    },
-                    enabled = true
+            ExpandableCard(title = "Management options") {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Add Location")
-                }
+                    Button(
+                        onClick = {
+                            Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
+                            viewModel.addCarLocation(car.id)
+                        },
+                        enabled = true
+                    ) {
+                        Text("Set Location")
+                    }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                    Button(onClick = { showDialog = true }) {
+                        Text("Upload photo")
+                    }
 
-                Button(onClick = { showDialog = true }) {
-                    Text("Upload")
+                    Button(onClick = {
+                        navController.navigate("timeslotManagement/${car.id}")
+                    }) {
+                        Text("Timeslots")
+                    }
                 }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                colors = ButtonDefaults.buttonColors().copy(
+                    containerColor = Color.Red
+                ), onClick = { viewModel.unregisterCar(car.id) }) {
+                Text(text = "Remove car")
             }
         }
     }
@@ -256,7 +279,7 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
                     showDialog = false
                     galleryLauncher.launch("image/*")
                 }) {
-                    Text("Choose from Gallery")
+                    Text("Gallery")
                 }
             }
         )
@@ -265,7 +288,7 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
 
 @Composable
 fun CarInfo(car: OwnedCarResponse) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(4.dp)) {
         SpecificationRow("Model", car.model)
         SpecificationRow("Category", car.category)
         SpecificationRow("Fuel", car.fuel)

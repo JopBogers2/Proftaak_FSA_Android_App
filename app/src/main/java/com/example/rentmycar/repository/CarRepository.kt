@@ -89,6 +89,23 @@ class CarRepository @Inject constructor(private val apiService: ApiService) {
         }
     }
 
+    suspend fun unregisterCar(carId: Int): Result<String> {
+        return try {
+            val response = apiService.unregisterCar(carId)
+            if (response.isSuccessful) {
+                val responseBody = response.message() ?: "Car unregistered successfully"
+                Result.success(responseBody)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Result.failure(Exception("Failed to unregister car: $errorBody"))
+            }
+        } catch (e: IOException) {
+            Result.failure(Exception("Network error: ${e.message}", e))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun addCarLocation(locationRequest: LocationRequest): Result<Unit> {
         return try {
             Log.d("CarRepository", "Sending location request: $locationRequest")

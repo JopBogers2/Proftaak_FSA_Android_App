@@ -16,6 +16,8 @@ import com.example.rentmycar.screens.app.ProfileScreen
 import com.example.rentmycar.screens.app.ReservationsScreen
 import com.example.rentmycar.screens.app.car.CarItemScreen
 import com.example.rentmycar.screens.app.car.owner.AddCarScreen
+import com.example.rentmycar.screens.app.car.owner.AddTimeslotScreen
+import com.example.rentmycar.screens.app.car.owner.ManageTimeslotsScreen
 import com.example.rentmycar.screens.app.car.owner.OwnedCarsScreen
 import com.example.rentmycar.screens.auth.LoginScreen
 import com.example.rentmycar.screens.auth.RegisterScreen
@@ -56,7 +58,7 @@ fun AppNavigation(navController: NavHostController, context: Context) {
             DirectionScreen(navController, carId)
         }
         composable(
-            "timeslots/{carId}",
+            "reservableTimeslots/{carId}",
             arguments = listOf(
                 navArgument("carId") {
                     type = NavType.IntType
@@ -67,6 +69,32 @@ fun AppNavigation(navController: NavHostController, context: Context) {
         ) { backStackEntry ->
             val carId = backStackEntry.arguments?.getInt("carId") ?: throw Error()
             AvailableTimeslotsScreen(navController, carId)
+        }
+        composable(
+            "timeslotManagement/{carId}",
+            arguments = listOf(
+                navArgument("carId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+
+        ) { backStackEntry ->
+            val carId = backStackEntry.arguments?.getInt("carId") ?: throw Error()
+            ManageTimeslotsScreen(navController, carId)
+        }
+        composable(
+            "addTimeslot/{carId}",
+            arguments = listOf(
+                navArgument("carId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+
+        ) { backStackEntry ->
+            val carId = backStackEntry.arguments?.getInt("carId") ?: throw Error()
+            AddTimeslotScreen(navController, carId)
         }
     }
 }
