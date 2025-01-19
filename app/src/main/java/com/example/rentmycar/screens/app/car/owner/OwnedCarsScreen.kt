@@ -1,10 +1,11 @@
 package com.example.rentmycar.screens.app.car.owner
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,14 +16,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,35 +54,15 @@ import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.components.ExpandableCard
 import com.example.rentmycar.components.ImageCarousel
-import com.example.rentmycar.components.car.SpecificationRow
-import com.example.rentmycar.navigation.AppNavItem
+import com.example.rentmycar.viewmodel.car.CarUpdateViewModel
+import com.example.rentmycar.viewmodel.car.UpdateState
+import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
 import com.example.rentmycar.viewmodel.car.owner.OwnedCarsViewModel
 import com.example.rentmycar.viewmodel.car.owner.UserCarsViewState
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import com.example.rentmycar.api.requests.UpdateCarRequest
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.IconButton
-import com.example.rentmycar.viewmodel.car.CarUpdateViewModel
-import com.example.rentmycar.viewmodel.car.UpdateState
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
-
 
 
 @Composable
@@ -79,7 +71,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
     var showAddCarDialog by remember { mutableStateOf(false) }
     var refreshTrigger by remember { mutableStateOf(0) }
 
-      LaunchedEffect(refreshTrigger) {
+    LaunchedEffect(refreshTrigger) {
         viewModel.getUserCars()
     }
 
@@ -100,7 +92,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
         ) {
 
             Text(
-                "My Cars",
+                stringResource(R.string.my_cars),
                 style = MaterialTheme.typography.headlineMedium,
             )
 
@@ -111,7 +103,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
                     contentDescription = "Add icon",
                     modifier = Modifier.padding(end = 4.dp),
                 )
-                Text("Add Car")
+                Text(stringResource(R.string.add_car))
             }
         }
 
@@ -132,14 +124,14 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
 
             is UserCarsViewState.NoCars -> {
                 Text(
-                    text = "You don't have any cars registered.",
+                    text = stringResource(R.string.you_don_t_have_any_cars_registered),
                     modifier = Modifier.padding(16.dp)
                 )
             }
 
             is UserCarsViewState.Error -> {
                 Text(
-                    text = "Error: ${state.message}",
+                    text = stringResource(R.string.error, state.message),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -164,7 +156,7 @@ fun AddCarDialog(onDismiss: () -> Unit, onCarAdded: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add New Car") },
+        title = { Text(stringResource(R.string.add_new_car)) },
         text = {
             AddCarScreen(
                 viewModel = addCarViewModel,
@@ -177,7 +169,7 @@ fun AddCarDialog(onDismiss: () -> Unit, onCarAdded: () -> Unit) {
         confirmButton = {},
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -246,18 +238,18 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                 .padding(16.dp)
         ) {
 
-              Text("Brand: ${car.brand}", style = MaterialTheme.typography.titleMedium)
+            Text("Brand: ${car.brand}", style = MaterialTheme.typography.titleMedium)
             Text(" ${car.model}", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            ExpandableCard(title = "Images") {
+            ExpandableCard(title = stringResource(R.string.images)) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     val images = carImages[car.id] ?: emptyList()
                     if (images.isNotEmpty()) {
                         ImageCarousel(images, context)
                     } else {
-                        Text("No images available")
+                        Text(stringResource(R.string.no_images_available))
                     }
                 }
             }
@@ -265,29 +257,28 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
             Spacer(modifier = Modifier.height(8.dp))
 
 
-          CarInfo(car, carUpdateViewModel)
+            CarInfo(car, carUpdateViewModel)
 
             if (car.locationId != null) {
-                Text(text = "Location ID: ${car.locationId}")
+                Text(text = stringResource(R.string.location_id, car.locationId))
             } else {
-                Text(text = "Location: Not available")
+                Text(text = stringResource(R.string.location_not_available))
             }
 
             Row {
                 Button(
                     onClick = {
-                        Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
                         viewModel.addCarLocation(car.id)
                     },
                     enabled = true
                 ) {
-                    Text("Add Location")
+                    Text(stringResource(R.string.add_location))
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Button(onClick = { showDialog = true }) {
-                    Text("Upload")
+                    Text(stringResource(R.string.upload))
                 }
 
             }
@@ -297,8 +288,8 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Upload Image") },
-            text = { Text("Choose an option") },
+            title = { Text(stringResource(R.string.upload_image)) },
+            text = { Text(stringResource(R.string.choose_an_option)) },
             confirmButton = {
                 Button(onClick = {
                     showDialog = false
@@ -314,7 +305,7 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                     tempImageUri = uri
                     cameraLauncher.launch(uri)
                 }) {
-                    Text("Take Photo")
+                    Text(stringResource(R.string.take_photo))
                 }
             },
             dismissButton = {
@@ -322,14 +313,13 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                     showDialog = false
                     galleryLauncher.launch("image/*")
                 }) {
-                    Text("Choose from Gallery")
+                    Text(stringResource(R.string.choose_from_gallery))
                 }
             }
         )
     }
 
 }
-
 
 
 @Composable
@@ -348,12 +338,14 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
         val currentCar = carDetailsMap[car.id] ?: car
 
 
-        Text("Category: ${currentCar.category}",
-             style = MaterialTheme.typography.bodyMedium,
-             modifier = Modifier.padding(vertical = 4.dp))
+        Text(
+            stringResource(R.string.category, currentCar.category),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
         EditableDropdownField(
-            label = "Fuel",
+            label = stringResource(R.string.fuel),
             value = currentCar.fuel,
             options = listOf("DIESEL", "PETROL", "GAS", "ELECTRIC", "HYDROGEN"),
             isEditing = editingField == "fuel"
@@ -363,7 +355,7 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
             carUpdateViewModel.updateCar(editedCar)
         }
         EditableDropdownField(
-            label = "Transmission",
+            label = stringResource(R.string.transmission),
             value = currentCar.transmission,
             options = listOf("AUTOMATIC", "MANUAL"),
             isEditing = editingField == "transmission"
@@ -372,22 +364,22 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
             editingField = null
             carUpdateViewModel.updateCar(editedCar)
         }
-        EditableField("Color", currentCar.color, editingField == "color") { newValue ->
+        EditableField(stringResource(R.string.color), currentCar.color, editingField == "color") { newValue ->
             editedCar = editedCar.copy(color = newValue)
             editingField = null
             carUpdateViewModel.updateCar(editedCar)
         }
 
-            EditableField("Price", currentCar.price.toString(), editingField == "price") { newValue ->
+        EditableField(stringResource(R.string.fuel), currentCar.price.toString(), editingField == "price") { newValue ->
             val newPrice = newValue.toDoubleOrNull()
             if (newPrice != null) {
                 editedCar = editedCar.copy(price = newPrice)
                 editingField = null
                 carUpdateViewModel.updateCar(editedCar)
-               }
-           }
+            }
+        }
 
-           EditableField("Year", currentCar.year.toString(), editingField == "year") { newValue ->
+        EditableField(stringResource(R.string.year), currentCar.year.toString(), editingField == "year") { newValue ->
             val newYear = newValue.toIntOrNull()
             if (newYear != null) {
                 editedCar = editedCar.copy(year = newYear)
@@ -396,14 +388,17 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
             }
         }
 
-        Text("License plate: ${currentCar.licensePlate}",
-             style = MaterialTheme.typography.bodyMedium,
-             modifier = Modifier.padding(vertical = 4.dp))
+        Text(
+            stringResource(R.string.license_plate_for, currentCar.licensePlate),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
         when (updateState) {
             is UpdateState.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.padding(8.dp))
             }
+
             is UpdateState.Success -> {
                 Text(
                     text = (updateState as UpdateState.Success).message,
@@ -411,10 +406,11 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
                     modifier = Modifier.padding(8.dp)
                 )
             }
+
             is UpdateState.Error -> {
                 val errorState = updateState as UpdateState.Error
                 Text(
-                    text = "Error: ${errorState.message}",
+                    text = stringResource(R.string.error, errorState.message),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -426,6 +422,7 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
                     )
                 }
             }
+
             else -> {}
         }
     }
@@ -469,7 +466,7 @@ fun EditableField(
                 editing = false
                 onValueChange(text)
             }) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         } else {
             Text(
@@ -479,7 +476,7 @@ fun EditableField(
                     .clickable { editing = true }
             )
             IconButton(onClick = { editing = true }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
             }
         }
     }
@@ -531,7 +528,7 @@ fun EditableDropdownField(
                 editing = false
                 onValueChange(selectedOption)
             }) {
-                Text("Save")
+                Text(stringResource(R.string.save))
             }
         } else {
             Text(
@@ -541,7 +538,7 @@ fun EditableDropdownField(
                     .clickable { editing = true }
             )
             IconButton(onClick = { editing = true }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit")
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
             }
         }
     }

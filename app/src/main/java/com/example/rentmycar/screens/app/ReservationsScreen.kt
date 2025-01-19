@@ -16,9 +16,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.R
 import com.example.rentmycar.components.ReservationCard
 import com.example.rentmycar.viewmodel.ReservationsViewModel
 import com.example.rentmycar.viewmodel.ReservationViewState
@@ -60,7 +62,7 @@ fun ReservationsScreen(navController: NavHostController) {
                         verticalArrangement = Arrangement.Top,
                     ) {
                         Text(
-                            "Reservations",
+                            stringResource(R.string.reservations),
                             style = MaterialTheme.typography.headlineMedium,
                         )
                         LazyColumn(modifier = Modifier.fillMaxHeight()) {
