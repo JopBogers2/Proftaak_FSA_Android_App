@@ -2,15 +2,19 @@ package com.example.rentmycar.screens.app.car.owner
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,17 +31,8 @@ import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.viewmodel.car.owner.DataLoadingState
 import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
 import com.example.rentmycar.viewmodel.car.owner.RegistrationState
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCarScreen(
     viewModel: OwnedCarViewModel = hiltViewModel(),
@@ -78,20 +73,26 @@ fun AddCarScreen(
                 delay(2000)
                 onDismiss()
             }
-        is RegistrationState.Error -> {
-            Log.e("AddCarScreen", "Error adding car: ${(registrationState as RegistrationState.Error).message}")
-            isCarAdded = false
-            errorMessage = (registrationState as RegistrationState.Error).message
-            fieldErrors = (registrationState as RegistrationState.Error).fieldErrors
-        }
-        is RegistrationState.Loading -> {
-            Log.d("AddCarScreen", "Car registration in progress")
-        }
-        else -> {
-            Log.d("AddCarScreen", "Unknown registration state: $registrationState")
+
+            is RegistrationState.Error -> {
+                Log.e(
+                    "AddCarScreen",
+                    "Error adding car: ${(registrationState as RegistrationState.Error).message}"
+                )
+                isCarAdded = false
+                errorMessage = (registrationState as RegistrationState.Error).message
+                fieldErrors = (registrationState as RegistrationState.Error).fieldErrors
+            }
+
+            is RegistrationState.Loading -> {
+                Log.d("AddCarScreen", "Car registration in progress")
+            }
+
+            else -> {
+                Log.d("AddCarScreen", "Unknown registration state: $registrationState")
+            }
         }
     }
-}
 
 
 
@@ -108,9 +109,11 @@ fun AddCarScreen(
             is DataLoadingState.Error -> {
                 errorMessage = state.message
             }
+
             is DataLoadingState.Success -> {
                 errorMessage = null
             }
+
             else -> {
 
             }
@@ -122,11 +125,9 @@ fun AddCarScreen(
             is DataLoadingState.Loading -> {
                 CircularProgressIndicator()
             }
+
             is DataLoadingState.Success -> {
-
-
-
-           RoundedDropdownMenu(
+                RoundedDropdownMenu(
                     expanded = expandedBrand,
                     onExpandedChange = { expandedBrand = it },
                     value = selectedBrand?.name ?: "",
@@ -141,122 +142,124 @@ fun AddCarScreen(
                     }
                 )
 
-        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
 
-        RoundedDropdownMenu(
-            expanded = expandedModel,
-            onExpandedChange = { expandedModel = !expandedModel },
-            value = selectedModel?.name ?: "",
-            label = "Model",
-            options = models.map { it.name },
-            onOptionSelected = { modelName ->
-                val model = models.find { it.name == modelName }
-                model?.let { viewModel.selectModel(it.id) }
-                expandedModel = false
-            }
-        )
+                RoundedDropdownMenu(
+                    expanded = expandedModel,
+                    onExpandedChange = { expandedModel = !expandedModel },
+                    value = selectedModel?.name ?: "",
+                    label = "Model",
+                    options = models.map { it.name },
+                    onOptionSelected = { modelName ->
+                        val model = models.find { it.name == modelName }
+                        model?.let { viewModel.selectModel(it.id) }
+                        expandedModel = false
+                    }
+                )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        RoundedTextField(
-            value = licensePlate,
-            onValueChange = { licensePlate = it },
-            label = "License Plate"
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
 
-        RoundedTextField(
-            value = year,
-            onValueChange = { year = it },
-            label = "Year"
-        )
+                RoundedTextField(
+                    value = licensePlate,
+                    onValueChange = { licensePlate = it },
+                    label = "License Plate"
+                )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        RoundedTextField(
-            value = color,
-            onValueChange = { color = it },
-            label = "Color"
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
 
-        RoundedTextField(
-            value = price,
-            onValueChange = { price = it },
-            label = "Price"
-        )
+                RoundedTextField(
+                    value = year,
+                    onValueChange = { year = it },
+                    label = "Year"
+                )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-
-        RoundedDropdownMenu(
-            expanded = expandedTransmission,
-            onExpandedChange = { expandedTransmission = !expandedTransmission },
-            value = selectedTransmission ?: "",
-            label = "Transmission",
-            options = transmissionOptions,
-            onOptionSelected = {
-                selectedTransmission = it
-                expandedTransmission = false
-            }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
 
-        RoundedDropdownMenu(
-            expanded = expandedFuelType,
-            onExpandedChange = { expandedFuelType = !expandedFuelType },
-            value = selectedFuelType ?: "",
-            label = "Fuel Type",
-            options = fuelTypeOptions,
-            onOptionSelected = {
-                selectedFuelType = it
-                expandedFuelType = false
-            }
-        )
-Button(
-    onClick = {
-        val carRequest = RegisterCarRequest(
-            licensePlate = licensePlate,
-            modelId = selectedModelId ?: 0,
-            fuel = selectedFuelType ?: "",
-            year = year.toIntOrNull() ?: 0,
-            color = color,
-            transmission = selectedTransmission ?: "",
-            price = price.toDoubleOrNull() ?: 0.0
-        )
+                RoundedTextField(
+                    value = color,
+                    onValueChange = { color = it },
+                    label = "Color"
+                )
 
-        viewModel.registerCar(carRequest) { carId ->
-            if (carId != null) {
-                isCarAdded = true
-                errorMessage = "Car added successfully with ID: $carId"
+                Spacer(modifier = Modifier.height(8.dp))
 
-                licensePlate = ""
-                year = ""
-                color = ""
-                price = ""
-                selectedTransmission = null
-                selectedFuelType = null
-                viewModel.selectBrand(-1)
-                viewModel.selectModel(-1)
-            } else {
-                isCarAdded = false
-                errorMessage = "Failed to add car. Please try again."
-            }
-        }
-    },
-    modifier = Modifier.align(Alignment.CenterHorizontally)
-) {
-    Text("Add Car")
-}
+
+                RoundedTextField(
+                    value = price,
+                    onValueChange = { price = it },
+                    label = "Price"
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                RoundedDropdownMenu(
+                    expanded = expandedTransmission,
+                    onExpandedChange = { expandedTransmission = !expandedTransmission },
+                    value = selectedTransmission ?: "",
+                    label = "Transmission",
+                    options = transmissionOptions,
+                    onOptionSelected = {
+                        selectedTransmission = it
+                        expandedTransmission = false
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                RoundedDropdownMenu(
+                    expanded = expandedFuelType,
+                    onExpandedChange = { expandedFuelType = !expandedFuelType },
+                    value = selectedFuelType ?: "",
+                    label = "Fuel Type",
+                    options = fuelTypeOptions,
+                    onOptionSelected = {
+                        selectedFuelType = it
+                        expandedFuelType = false
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        val carRequest = RegisterCarRequest(
+                            licensePlate = licensePlate,
+                            modelId = selectedModelId ?: 0,
+                            fuel = selectedFuelType ?: "",
+                            year = year.toIntOrNull() ?: 0,
+                            color = color,
+                            transmission = selectedTransmission ?: "",
+                            price = price.toDoubleOrNull() ?: 0.0
+                        )
+
+                        viewModel.registerCar(carRequest) { carId ->
+                            if (carId != null) {
+                                isCarAdded = true
+                                errorMessage = "Car added successfully with ID: $carId"
+
+                                licensePlate = ""
+                                year = ""
+                                color = ""
+                                price = ""
+                                selectedTransmission = null
+                                selectedFuelType = null
+                                viewModel.selectBrand(-1)
+                                viewModel.selectModel(-1)
+                            } else {
+                                isCarAdded = false
+                                errorMessage = "Failed to add car. Please try again."
+                            }
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Add Car")
+                }
 
                 if (isCarAdded) {
                     Text(
@@ -265,8 +268,6 @@ Button(
                         modifier = Modifier.padding(top = 16.dp)
                     )
                 }
-
-
             }
             else -> {
 
@@ -280,7 +281,6 @@ Button(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoundedTextField(
     value: String,
@@ -325,7 +325,6 @@ fun RoundedDropdownMenu(
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
             modifier = Modifier
-                .menuAnchor()
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         )
