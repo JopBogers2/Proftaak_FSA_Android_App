@@ -52,33 +52,36 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-
 import androidx.compose.ui.unit.dp
-
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import com.example.rentmycar.api.requests.UpdateCarRequest
-
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.IconButton
 import com.example.rentmycar.viewmodel.car.CarUpdateViewModel
 import com.example.rentmycar.viewmodel.car.UpdateState
-
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
+
+
 
 @Composable
 fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
+    var showAddCarDialog by remember { mutableStateOf(false) }
+    var refreshTrigger by remember { mutableStateOf(0) }
+
+      LaunchedEffect(refreshTrigger) {
+        viewModel.getUserCars()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getUserCars()
@@ -95,20 +98,14 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            // Title
+
             Text(
                 "My Cars",
                 style = MaterialTheme.typography.headlineMedium,
             )
 
-            // Button to expand the filter inputs section
-            Button(onClick = {
-                try {
-                    navController.navigate(AppNavItem.AddCar.route)
-                } catch (e: Exception) {
-                    Log.e("Navigation", "Error navigating to AddCar: ${e.message}", e)
-                }
-            }) {
+
+            Button(onClick = { showAddCarDialog = true }) {
                 Icon(
                     painter = painterResource(R.drawable.add),
                     contentDescription = "Add icon",
@@ -149,9 +146,42 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             }
         }
     }
+    if (showAddCarDialog) {
+        AddCarDialog(
+            onDismiss = { showAddCarDialog = false },
+            onCarAdded = {
+                showAddCarDialog = false
+                refreshTrigger++
+            }
+        )
+    }
 }
 
 
+@Composable
+fun AddCarDialog(onDismiss: () -> Unit, onCarAdded: () -> Unit) {
+    val addCarViewModel: OwnedCarViewModel = hiltViewModel()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add New Car") },
+        text = {
+            AddCarScreen(
+                viewModel = addCarViewModel,
+                onCarAdded = {
+                    onCarAdded()
+                    onDismiss()
+                }
+            )
+        },
+        confirmButton = {},
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 
 @Composable
 fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController: NavController) {
@@ -162,9 +192,6 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
     var showDialog by remember { mutableStateOf(false) }
     var isUploading by remember { mutableStateOf(false) }
-    var editedCar by remember(car) { mutableStateOf(car) }
-
-
 
 
 
@@ -218,7 +245,9 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text("Model: ${car.model}", style = MaterialTheme.typography.titleMedium)
+
+              Text("Brand: ${car.brand}", style = MaterialTheme.typography.titleMedium)
+            Text(" ${car.model}", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -260,8 +289,6 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                 Button(onClick = { showDialog = true }) {
                     Text("Upload")
                 }
-
-
 
             }
         }
@@ -320,7 +347,7 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
     Column(modifier = Modifier.padding(16.dp)) {
         val currentCar = carDetailsMap[car.id] ?: car
 
-        // Display Category as non-editable text
+
         Text("Category: ${currentCar.category}",
              style = MaterialTheme.typography.bodyMedium,
              modifier = Modifier.padding(vertical = 4.dp))
@@ -351,7 +378,24 @@ fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hilt
             carUpdateViewModel.updateCar(editedCar)
         }
 
-        // Display License plate as non-editable text
+            EditableField("Price", currentCar.price.toString(), editingField == "price") { newValue ->
+            val newPrice = newValue.toDoubleOrNull()
+            if (newPrice != null) {
+                editedCar = editedCar.copy(price = newPrice)
+                editingField = null
+                carUpdateViewModel.updateCar(editedCar)
+               }
+           }
+
+           EditableField("Year", currentCar.year.toString(), editingField == "year") { newValue ->
+            val newYear = newValue.toIntOrNull()
+            if (newYear != null) {
+                editedCar = editedCar.copy(year = newYear)
+                editingField = null
+                carUpdateViewModel.updateCar(editedCar)
+            }
+        }
+
         Text("License plate: ${currentCar.licensePlate}",
              style = MaterialTheme.typography.bodyMedium,
              modifier = Modifier.padding(vertical = 4.dp))

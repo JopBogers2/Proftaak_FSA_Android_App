@@ -4,6 +4,7 @@ data class OwnedCarResponse(
     val id: Int,
     val ownerId: Int,
     val locationId: Int?,
+    val brand: String,
     val model: String,
     val licensePlate: String,
     val fuel: String,
