@@ -119,6 +119,7 @@ class OwnedCarViewModel @Inject constructor(
         }
     }
 
+
     private fun parseFieldErrors(errorMessage: String): Map<String, String> {
         val fieldErrors = mutableMapOf<String, String>()
         if (errorMessage.contains("licensePlate")) fieldErrors["licensePlate"] =

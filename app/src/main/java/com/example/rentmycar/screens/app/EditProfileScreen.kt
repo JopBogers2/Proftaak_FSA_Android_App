@@ -2,17 +2,22 @@ package com.example.rentmycar.screens.app
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,8 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.api.requests.UserUpdateRequest
+import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.ProfileViewModel
 import com.example.rentmycar.viewmodel.ProfileViewState
@@ -70,7 +75,7 @@ fun EditProfileScreen(
                 }
 
                 is ProfileViewState.Success -> {
-                    EditProfileView(state.user, viewModel)
+                    EditProfileView(state.user, viewModel, navController)
                 }
             }
         }
@@ -80,7 +85,8 @@ fun EditProfileScreen(
 @Composable
 fun EditProfileView(
     userResponse: UserResponse,
-    viewModel: ProfileViewModel
+    viewModel: ProfileViewModel,
+    navController: NavHostController
 ) {
     var showPassword by remember { mutableStateOf(false) }
 
@@ -103,6 +109,20 @@ fun EditProfileView(
             user.password.isNotEmpty()
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+            TextButton(
+                onClick = {
+                    navController.popBackStack()
+                },
+                contentPadding = PaddingValues(all = 0.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Back icon",
+                )
+                Text("Back")
+            }
+        }
         Text(
             text = "Edit Profile",
             style = MaterialTheme.typography.headlineLarge
