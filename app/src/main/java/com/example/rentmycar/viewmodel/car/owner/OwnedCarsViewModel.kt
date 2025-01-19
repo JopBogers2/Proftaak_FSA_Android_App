@@ -58,7 +58,10 @@ class OwnedCarsViewModel @Inject constructor(
             try {
                 val cancellationTokenSource = CancellationTokenSource()
 
-                fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
+                fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    cancellationTokenSource.token
+                )
                     .addOnSuccessListener { location ->
                         if (location != null) {
                             viewModelScope.launch {
@@ -199,6 +202,23 @@ class OwnedCarsViewModel @Inject constructor(
                 Log.e("UserCarsViewModel", "Exception in getImagesByCar for car $carId", e)
                 _viewState.value =
                     UserCarsViewState.Error("Exception fetching images for car $carId: ${e.message}")
+            }
+        }
+    }
+
+    fun unregisterCar(carId: Int) {
+        viewModelScope.launch {
+            try {
+                val result = carRepository.unregisterCar(carId)
+                result.onSuccess {
+                    getUserCars()
+                }.onFailure { error ->
+                    _viewState.value =
+                        UserCarsViewState.Error("Failed to fetch unregister car $carId: ${error.message}")
+                }
+            } catch (e: Exception) {
+                _viewState.value =
+                    UserCarsViewState.Error("Exception fetching unregistering car $carId: ${e.message}")
             }
         }
     }

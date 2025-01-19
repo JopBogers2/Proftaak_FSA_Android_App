@@ -4,7 +4,9 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,28 +14,40 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,42 +56,22 @@ import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.components.ExpandableCard
 import com.example.rentmycar.components.ImageCarousel
-import com.example.rentmycar.components.car.SpecificationRow
-import com.example.rentmycar.navigation.AppNavItem
+import com.example.rentmycar.viewmodel.car.CarUpdateViewModel
+import com.example.rentmycar.viewmodel.car.UpdateState
+import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
 import com.example.rentmycar.viewmodel.car.owner.OwnedCarsViewModel
 import com.example.rentmycar.viewmodel.car.owner.UserCarsViewState
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import com.example.rentmycar.api.requests.UpdateCarRequest
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.IconButton
-import com.example.rentmycar.viewmodel.car.CarUpdateViewModel
-import com.example.rentmycar.viewmodel.car.UpdateState
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
-
 
 
 @Composable
 fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
     var showAddCarDialog by remember { mutableStateOf(false) }
-    var refreshTrigger by remember { mutableStateOf(0) }
+    var refreshTrigger by remember { mutableIntStateOf(0) }
 
       LaunchedEffect(refreshTrigger) {
         viewModel.getUserCars()
@@ -125,7 +119,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             is UserCarsViewState.Success -> {
                 LazyColumn {
                     items(state.cars) { car ->
-                        CarItem(car, viewModel, navController)
+                        CarItem(navController, car, viewModel)
                     }
                 }
             }
@@ -184,7 +178,7 @@ fun AddCarDialog(onDismiss: () -> Unit, onCarAdded: () -> Unit) {
 }
 
 @Composable
-fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController: NavController) {
+fun CarItem(navController: NavController, car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
     val context = LocalContext.current
     val carImages by viewModel.carImages.collectAsState()
     val carUpdateViewModel: CarUpdateViewModel = hiltViewModel()
@@ -243,7 +237,7 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
 
               Text("Brand: ${car.brand}", style = MaterialTheme.typography.titleMedium)
@@ -251,8 +245,14 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            if (car.locationId != null) {
+                Text(text = "Location: Location set")
+            } else {
+                Text(text = "Location: No Location set")
+            }
+
             ExpandableCard(title = "Images") {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column {
                     val images = carImages[car.id] ?: emptyList()
                     if (images.isNotEmpty()) {
                         ImageCarousel(images, context)
@@ -273,23 +273,43 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                 Text(text = "Location: Not available")
             }
 
-            Row {
-                Button(
-                    onClick = {
-                        Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
-                        viewModel.addCarLocation(car.id)
-                    },
-                    enabled = true
+            ExpandableCard(title = "Management options") {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Add Location")
+                    Button(
+                        onClick = {
+                            Log.d("UserCarsScreen", "Add Location button clicked for car ${car.id}")
+                            viewModel.addCarLocation(car.id)
+                        },
+                        enabled = true
+                    ) {
+                        Text("Set Location")
+                    }
+
+                    Button(onClick = { showDialog = true }) {
+                        Text("Upload photo")
+                    }
+
+                    Button(onClick = {
+                        navController.navigate("timeslotManagement/${car.id}")
+                    }) {
+                        Text("Timeslots")
+                    }
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+            }
 
-                Button(onClick = { showDialog = true }) {
-                    Text("Upload")
-                }
+            Spacer(modifier = Modifier.height(8.dp))
 
+            Button(
+                colors = ButtonDefaults.buttonColors().copy(
+                    containerColor = Color.Red
+                ), onClick = { viewModel.unregisterCar(car.id) }) {
+                Text(text = "Remove car")
             }
         }
     }
@@ -322,7 +342,7 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                     showDialog = false
                     galleryLauncher.launch("image/*")
                 }) {
-                    Text("Choose from Gallery")
+                    Text("Gallery")
                 }
             }
         )

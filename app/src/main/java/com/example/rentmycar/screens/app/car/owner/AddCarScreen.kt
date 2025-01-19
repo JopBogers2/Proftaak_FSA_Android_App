@@ -269,6 +269,7 @@ fun AddCarScreen(
                     )
                 }
             }
+
             else -> {
 
             }
@@ -325,6 +326,7 @@ fun RoundedDropdownMenu(
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
             modifier = Modifier
+                .menuAnchor()
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         )
