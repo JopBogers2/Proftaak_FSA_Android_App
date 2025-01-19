@@ -1,6 +1,5 @@
 package com.example.rentmycar.screens.app.car.owner
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,8 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar.R
 import com.example.rentmycar.api.requests.RegisterCarRequest
 import com.example.rentmycar.viewmodel.car.owner.DataLoadingState
 import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
@@ -64,32 +65,23 @@ fun AddCarScreen(
     val fuelTypeOptions = listOf("DIESEL", "PETROL", "GAS", "ELECTRIC", "HYDROGEN")
 
     LaunchedEffect(registrationState) {
-        Log.d("AddCarScreen", "Registration state changed: $registrationState")
         when (registrationState) {
             is RegistrationState.Success -> {
                 isCarAdded = true
-                errorMessage = "Car added successfully!"
+                errorMessage = R.string.car_added_successfully.toString()
                 onCarAdded()
                 delay(2000)
                 onDismiss()
             }
 
             is RegistrationState.Error -> {
-                Log.e(
-                    "AddCarScreen",
-                    "Error adding car: ${(registrationState as RegistrationState.Error).message}"
-                )
                 isCarAdded = false
                 errorMessage = (registrationState as RegistrationState.Error).message
                 fieldErrors = (registrationState as RegistrationState.Error).fieldErrors
             }
 
-            is RegistrationState.Loading -> {
-                Log.d("AddCarScreen", "Car registration in progress")
-            }
-
             else -> {
-                Log.d("AddCarScreen", "Unknown registration state: $registrationState")
+
             }
         }
     }
@@ -131,7 +123,7 @@ fun AddCarScreen(
                     expanded = expandedBrand,
                     onExpandedChange = { expandedBrand = it },
                     value = selectedBrand?.name ?: "",
-                    label = "Brand",
+                    label = stringResource(R.string.brand),
                     options = brands.map { it.name },
                     onOptionSelected = { brandName ->
                         val brand = brands.find { it.name == brandName }
@@ -149,7 +141,7 @@ fun AddCarScreen(
                     expanded = expandedModel,
                     onExpandedChange = { expandedModel = !expandedModel },
                     value = selectedModel?.name ?: "",
-                    label = "Model",
+                    label = stringResource(R.string.model),
                     options = models.map { it.name },
                     onOptionSelected = { modelName ->
                         val model = models.find { it.name == modelName }
@@ -164,7 +156,7 @@ fun AddCarScreen(
                 RoundedTextField(
                     value = licensePlate,
                     onValueChange = { licensePlate = it },
-                    label = "License Plate"
+                    label = stringResource(R.string.license_plate)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -173,7 +165,7 @@ fun AddCarScreen(
                 RoundedTextField(
                     value = year,
                     onValueChange = { year = it },
-                    label = "Year"
+                    label = stringResource(R.string.year)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -182,7 +174,7 @@ fun AddCarScreen(
                 RoundedTextField(
                     value = color,
                     onValueChange = { color = it },
-                    label = "Color"
+                    label = stringResource(R.string.color)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -191,7 +183,7 @@ fun AddCarScreen(
                 RoundedTextField(
                     value = price,
                     onValueChange = { price = it },
-                    label = "Price"
+                    label = stringResource(R.string.price)
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -201,7 +193,7 @@ fun AddCarScreen(
                     expanded = expandedTransmission,
                     onExpandedChange = { expandedTransmission = !expandedTransmission },
                     value = selectedTransmission ?: "",
-                    label = "Transmission",
+                    label = stringResource(R.string.transmission),
                     options = transmissionOptions,
                     onOptionSelected = {
                         selectedTransmission = it
@@ -216,7 +208,7 @@ fun AddCarScreen(
                     expanded = expandedFuelType,
                     onExpandedChange = { expandedFuelType = !expandedFuelType },
                     value = selectedFuelType ?: "",
-                    label = "Fuel Type",
+                    label = stringResource(R.string.fuel_type),
                     options = fuelTypeOptions,
                     onOptionSelected = {
                         selectedFuelType = it
@@ -240,7 +232,7 @@ fun AddCarScreen(
                         viewModel.registerCar(carRequest) { carId ->
                             if (carId != null) {
                                 isCarAdded = true
-                                errorMessage = "Car added successfully with ID: $carId"
+                                errorMessage = "Car added successfully with ID: ${carId}"
 
                                 licensePlate = ""
                                 year = ""
@@ -258,12 +250,12 @@ fun AddCarScreen(
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Text("Add Car")
+                    Text(stringResource(R.string.add_car))
                 }
 
                 if (isCarAdded) {
                     Text(
-                        "Car added successfully!",
+                        stringResource(R.string.car_added_successfully),
                         color = Color.Green,
                         modifier = Modifier.padding(top = 16.dp)
                     )

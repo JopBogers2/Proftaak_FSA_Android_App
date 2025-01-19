@@ -23,9 +23,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.R
 import com.example.rentmycar.components.TimeSlotCard
 import com.example.rentmycar.viewmodel.TimeslotsViewModel
 import com.example.rentmycar.viewmodel.TimeslotsViewState
@@ -51,7 +53,7 @@ fun AvailableTimeslotsScreen(navController: NavHostController, carId: Int) {
                 verticalArrangement = Arrangement.Top,
             ) {
                 Text(
-                    "Available Timeslots",
+                    stringResource(R.string.available_timeslots),
                     style = MaterialTheme.typography.headlineMedium,
                 )
                 TextButton(
@@ -64,7 +66,7 @@ fun AvailableTimeslotsScreen(navController: NavHostController, carId: Int) {
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = "Back icon",
                     )
-                    Text("Back to car")
+                    Text(stringResource(R.string.back_to_car))
                 }
                 when (val state = viewState) {
                     TimeslotsViewState.Loading -> {

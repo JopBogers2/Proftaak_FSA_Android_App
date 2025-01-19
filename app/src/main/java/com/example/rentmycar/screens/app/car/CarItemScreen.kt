@@ -30,9 +30,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.CarLocationResponse
 import com.example.rentmycar.api.responses.CarResponse
 import com.example.rentmycar.components.ExpandableCard
@@ -85,9 +87,9 @@ fun CarItemScreen(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "Back icon",
+                    contentDescription = stringResource(R.string.back_icon),
                 )
-                Text("Back home")
+                Text(stringResource(R.string.back_home))
             }
 
             // Header
@@ -131,7 +133,7 @@ fun CarItemHeader(car: CarResponse) {
                 style = MaterialTheme.typography.headlineMedium
             )
             // Owner
-            Text("Owner: @${car.ownerName}")
+            Text(stringResource(R.string.owner, car.ownerName))
         }
 
         // Price
@@ -161,9 +163,9 @@ fun CarItemActions(car: CarResponse, context: Context, navController: NavHostCon
         ) {
             Icon(
                 imageVector = Icons.Default.DateRange,
-                contentDescription = "Reserve icon",
+                contentDescription = stringResource(R.string.reserve_icon),
             )
-            Text("Reserve now")
+            Text(stringResource(R.string.reserve_now))
         }
 
         // Button which opens the mail app with owner's email in "To" text field
@@ -173,7 +175,8 @@ fun CarItemActions(car: CarResponse, context: Context, navController: NavHostCon
                     userEmail = car.ownerEmail,
                     context = context,
                     onError = {
-                        Toast.makeText(context, "No email app found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context,
+                            context.getString(R.string.no_email_app_found), Toast.LENGTH_SHORT).show()
                     }
                 )
             },
@@ -184,9 +187,9 @@ fun CarItemActions(car: CarResponse, context: Context, navController: NavHostCon
         ) {
             Icon(
                 imageVector = Icons.Default.Email,
-                contentDescription = "Email icon",
+                contentDescription = stringResource(R.string.email_icon),
             )
-            Text("Contact owner")
+            Text(stringResource(R.string.contact_owner))
         }
     }
 }
@@ -229,7 +232,7 @@ fun CarItemLocation(carLocation: CarLocationResponse?, context: Context, car: Ca
                 ) {
                     Marker(
                         state = carMarkerState,
-                        title = "${car.brand}, ${car.model} by @${car.ownerName}",
+                        title = stringResource(R.string.by, car.brand, car.model, car.ownerName),
                         icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE),
                     )
                 }
@@ -245,13 +248,13 @@ fun CarItemLocation(carLocation: CarLocationResponse?, context: Context, car: Ca
 fun CarItemInfo(car: CarResponse) {
     ExpandableCard(title = "Specifications") {
         Column(modifier = Modifier.padding(16.dp)) {
-            SpecificationRow("Brand", car.brand)
-            SpecificationRow("Model", car.model)
-            SpecificationRow("Category", car.category)
-            SpecificationRow("Fuel", car.fuel)
-            SpecificationRow("Transmission", car.transmission)
-            SpecificationRow("Color", car.color)
-            SpecificationRow("License plate", car.licensePlate)
+            SpecificationRow(stringResource(R.string.brand), car.brand)
+            SpecificationRow(stringResource(R.string.model), car.model)
+            SpecificationRow(stringResource(R.string.category), car.category)
+            SpecificationRow(stringResource(R.string.fuel), car.fuel)
+            SpecificationRow(stringResource(R.string.transmission), car.transmission)
+            SpecificationRow(stringResource(R.string.color), car.color)
+            SpecificationRow(stringResource(R.string.license_plate), car.licensePlate)
         }
     }
 }

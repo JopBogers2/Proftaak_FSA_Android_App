@@ -20,9 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.R
 import com.example.rentmycar.navigation.AppNavItem
 import com.example.rentmycar.navigation.BottomNavItem
 import com.example.rentmycar.viewmodel.AuthViewModel
@@ -60,42 +62,42 @@ fun RegisterScreen(navController: NavHostController, viewModel: AuthViewModel = 
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Create an Account",
+            text = stringResource(R.string.create_an_account),
             style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         OutlinedTextField(
             value = firstName,
             onValueChange = { firstName = it },
-            label = { Text("First Name") },
+            label = { Text(stringResource(R.string.first_name)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = lastName,
             onValueChange = { lastName = it },
-            label = { Text("Last Name") },
+            label = { Text(stringResource(R.string.last_name)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text(stringResource(R.string.username)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = if (showPassword) androidx.compose.ui.text.input.VisualTransformation.None else androidx.compose.ui.text.input.PasswordVisualTransformation(),
             trailingIcon = {
@@ -114,7 +116,7 @@ fun RegisterScreen(navController: NavHostController, viewModel: AuthViewModel = 
             if (viewState == AuthViewState.Loading) {
                 androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.size(20.dp))
             } else {
-                Text("Register")
+                Text(stringResource(R.string.register))
             }
         }
         when (val state = viewState) {
@@ -127,7 +129,7 @@ fun RegisterScreen(navController: NavHostController, viewModel: AuthViewModel = 
         }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Already have an account? Login here.",
+            text = stringResource(R.string.already_have_an_account),
             color = androidx.compose.ui.graphics.Color.Blue,
             modifier = Modifier
                 .clickable { navController.navigate(AppNavItem.Login.route) }

@@ -24,10 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.UserResponse
 import com.example.rentmycar.viewmodel.ProfileViewModel
 import com.example.rentmycar.viewmodel.ProfileViewState
@@ -84,7 +86,7 @@ fun ProfileView(user: UserResponse, viewModel: ProfileViewModel, navController: 
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "Profile",
+            text = stringResource(R.string.profile),
             style = MaterialTheme.typography.headlineLarge
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -114,36 +116,36 @@ fun ProfileView(user: UserResponse, viewModel: ProfileViewModel, navController: 
             onClick = {
                 navController.navigate("edit-profile")
             }) {
-            Text(text = "Edit Profile")
+            Text(text = stringResource(R.string.edit_profile))
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(modifier = Modifier.width(220.dp), onClick = { viewModel.logout() }) {
-            Text(text = "Logout")
+            Text(text = stringResource(R.string.logout))
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(modifier = Modifier.width(220.dp), colors = ButtonDefaults.buttonColors().copy(
             containerColor = Color.Red
         ), onClick = { showDeleteConfirmation = true }) {
-            Text(text = "Delete Profile")
+            Text(text = stringResource(R.string.delete_profile))
         }
     }
 
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text(text = "Delete Profile") },
-            text = { Text("Are you sure you want to delete your profile? This action cannot be undone.") },
+            title = { Text(text = stringResource(R.string.delete_profile)) },
+            text = { Text(stringResource(R.string.confirm_delete_profile)) },
             confirmButton = {
                 Button(onClick = {
                     viewModel.deleteUser() // Trigger the delete action
                     showDeleteConfirmation = false // Dismiss dialog
                 }) {
-                    Text("Yes, Delete")
+                    Text(stringResource(R.string.yes_delete))
                 }
             },
             dismissButton = {
                 Button(onClick = { showDeleteConfirmation = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

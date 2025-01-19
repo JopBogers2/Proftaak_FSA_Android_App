@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.rentmycar.R
 import com.example.rentmycar.components.DropdownInput
@@ -44,7 +45,7 @@ fun FilterComponent(
 
     //header
     Text(
-        "Available Cars",
+        stringResource(R.string.available_cars),
         style = MaterialTheme.typography.headlineMedium,
     )
     // Filters header
@@ -55,23 +56,25 @@ fun FilterComponent(
     ) {
         // sub heading
         Text(
-            "Filters",
+            stringResource(R.string.filters),
             style = MaterialTheme.typography.headlineSmall,
         )
         // Button to expand the filter inputs section
         Button(onClick = { isDialogOpened = true }) {
             Icon(
                 painter = painterResource(R.drawable.add),
-                contentDescription = "Add icon",
+                contentDescription = stringResource(R.string.add_icon),
                 modifier = Modifier.padding(end = 4.dp),
             )
-            Text("Add filters")
+            Text(stringResource(R.string.add_filters))
         }
     }
 
     // Filter chips
     if (filters.isNotEmpty()) {
-        Row(modifier = Modifier.height(40.dp).horizontalScroll(rememberScrollState(0))) {
+        Row(modifier = Modifier
+            .height(40.dp)
+            .horizontalScroll(rememberScrollState(0))) {
             for ((key, value) in filters.entries) {
                 FilterChip(
                     onClick = {
@@ -84,7 +87,7 @@ fun FilterComponent(
                     trailingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.close),
-                            contentDescription = "Close icon",
+                            contentDescription = stringResource(R.string.close_icon),
                             Modifier.size(InputChipDefaults.AvatarSize)
                         )
                     }
@@ -105,7 +108,7 @@ fun FilterComponent(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(
                     onClick = { isDialogOpened = false }
-                ) { Text("Hide filters") }
+                ) { Text(stringResource(R.string.hide_filters)) }
             }
         }
     }
@@ -128,11 +131,13 @@ fun FilterInputs(
     var radius by rememberSaveable { mutableStateOf(filters["radius"] ?: "") }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Category input
-        FilterRow("Category") {
+        FilterRow(stringResource(R.string.FilterCategory)) {
             DropdownInput(
                 initValue = category,
                 options = categories,
@@ -142,7 +147,7 @@ fun FilterInputs(
         }
 
         // Price (min & max) input
-        FilterRow("Price") {
+        FilterRow(stringResource(R.string.FilterPrice)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
@@ -166,7 +171,7 @@ fun FilterInputs(
         }
 
         // Radius input
-        FilterRow("Radius") {
+        FilterRow(stringResource(R.string.radius)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
@@ -209,7 +214,7 @@ fun FilterInputs(
                         }
                     }
                 }
-            ) { Text("Apply filters") }
+            ) { Text(stringResource(R.string.apply_filters)) }
         }
     }
 }
@@ -223,7 +228,9 @@ fun FilterRow(
     input: @Composable () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -19,8 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.TimeslotResponse
 import com.example.rentmycar.viewmodel.TimeslotsViewModel
 
@@ -50,7 +52,7 @@ fun ManageTimeslotCard(timeslot: TimeslotResponse, pastTimeslot: Boolean = false
                     .fillMaxWidth(),
             ) {
                 Text(
-                    "Timeslot",
+                    stringResource(R.string.timeslot),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
@@ -63,7 +65,7 @@ fun ManageTimeslotCard(timeslot: TimeslotResponse, pastTimeslot: Boolean = false
                 )
 
                 if (pastTimeslot) {
-                    Text("Timeslot has expired")
+                    Text(stringResource(R.string.timeslot_has_expired))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -84,7 +86,7 @@ fun ManageTimeslotCard(timeslot: TimeslotResponse, pastTimeslot: Boolean = false
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear reservation icon",
                         )
-                        Text("Remove")
+                        Text(stringResource(R.string.remove))
                     }
                 }
             }

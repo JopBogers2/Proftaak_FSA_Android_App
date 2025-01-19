@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -74,7 +75,7 @@ fun AddTimeslotScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        "Timeslots",
+                        stringResource(R.string.timeslots),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                     Button(onClick = {
@@ -85,7 +86,7 @@ fun AddTimeslotScreen(
                             contentDescription = "Add icon",
                             modifier = Modifier.padding(end = 4.dp),
                         )
-                        Text("Add timeslot")
+                        Text(stringResource(R.string.add_timeslot))
                     }
                 }
 
@@ -99,7 +100,7 @@ fun AddTimeslotScreen(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = "Back icon",
                     )
-                    Text("Back to car timeslots")
+                    Text(stringResource(R.string.back_to_car_timeslots))
                 }
 
                 Row {
@@ -115,7 +116,7 @@ fun AddTimeslotScreen(
                         OutlinedTextField(
                             value = selectedDate.toString(),
                             onValueChange = { fromDateTime = selectedDate },
-                            label = { Text("available from") },
+                            label = { Text(stringResource(R.string.available_from)) },
                             readOnly = true,
                             trailingIcon = {
                                 IconButton(onClick = { showDatePicker = !showDatePicker }) {
@@ -166,7 +167,7 @@ fun AddTimeslotScreen(
                         OutlinedTextField(
                             value = selectedDate.toString(),
                             onValueChange = { },
-                            label = { Text("available until") },
+                            label = { Text(stringResource(R.string.available_until)) },
                             readOnly = true,
                             trailingIcon = {
                                 IconButton(onClick = { showDatePicker = !showDatePicker }) {
@@ -208,7 +209,7 @@ fun AddTimeslotScreen(
                     onClick = { viewModel.addTimeslot(carId, fromDateTime, untilDateTime) },
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text("Add timeslot")
+                    Text(stringResource(R.string.add_timeslot))
                 }
 
                 when (val state = viewState) {

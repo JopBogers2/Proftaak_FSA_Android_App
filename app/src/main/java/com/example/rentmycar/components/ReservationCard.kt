@@ -20,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.rentmycar.R
 import com.example.rentmycar.api.responses.TimeslotResponse
 import com.example.rentmycar.viewmodel.ReservationsViewModel
 
@@ -56,15 +58,15 @@ fun ReservationCard(reservedTimeslot: TimeslotResponse, navController: NavContro
                     .fillMaxWidth(),
             ) {
                 Text(
-                    "Reservation",
+                    stringResource(R.string.reservation),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "From: ${reservedTimeslot.availableFrom}",
+                    stringResource(R.string.from, reservedTimeslot.availableFrom),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    "Until: ${reservedTimeslot.availableUntil}",
+                    stringResource(R.string.until, reservedTimeslot.availableUntil),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -85,7 +87,7 @@ fun ReservationCard(reservedTimeslot: TimeslotResponse, navController: NavContro
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear reservation icon",
                         )
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     Button(
                         onClick = {
@@ -100,7 +102,7 @@ fun ReservationCard(reservedTimeslot: TimeslotResponse, navController: NavContro
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = "route icon",
                         )
-                        Text("Route to car")
+                        Text(stringResource(R.string.route_to_car))
                     }
                 }
             }

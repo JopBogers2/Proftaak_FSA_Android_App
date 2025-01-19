@@ -23,9 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.rentmycar.R
 import com.example.rentmycar.viewmodel.DirectionsViewModel
 import com.example.rentmycar.viewmodel.DirectionsViewState
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -70,7 +72,7 @@ fun DirectionScreen(
                         verticalArrangement = Arrangement.Top,
                     ) {
                         Text(
-                            "Directions",
+                            stringResource(R.string.directions),
                             style = MaterialTheme.typography.headlineMedium,
                         )
                         TextButton(
@@ -83,7 +85,7 @@ fun DirectionScreen(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                                 contentDescription = "Back icon",
                             )
-                            Text("Back to reservations")
+                            Text(stringResource(R.string.back_to_reservations))
                         }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -118,7 +120,7 @@ fun DirectionScreen(
                         verticalArrangement = Arrangement.Top,
                     ) {
                         Text(
-                            "Directions",
+                            stringResource(R.string.directions),
                             style = MaterialTheme.typography.headlineMedium,
                         )
                         // Button to navigate back to reservation screen
@@ -132,7 +134,7 @@ fun DirectionScreen(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                                 contentDescription = "Back icon",
                             )
-                            Text("Back to reservations")
+                            Text(stringResource(R.string.back_to_reservations))
                         }
 
                         GoogleMap(

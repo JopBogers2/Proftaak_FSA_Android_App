@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -78,7 +79,7 @@ fun CarCard(carViewModel: CarViewModel, navController: NavController) {
                 }
 
                 // Owner
-                Text("Owner: @${car.ownerName}")
+                Text(stringResource(R.string.CarOwner, car.ownerName))
             }
         }
     }
@@ -96,7 +97,7 @@ fun CarFirstImage(imagePaths: List<String>, context: Context) {
             .data("http://10.0.2.2:8080/images/${imagePaths.first()}")
             .crossfade(true)
             .build(),
-        contentDescription = "Car image",
+        contentDescription = stringResource(R.string.car_image),
         modifier = Modifier
             .width(60.dp)
             .height(60.dp),
@@ -108,7 +109,7 @@ fun CarFirstImage(imagePaths: List<String>, context: Context) {
     // Placeholder image if the car does not have images
     Image(
         painter = painterResource(R.drawable.car_img_placeholder),
-        contentDescription = "Car image placeholder",
+        contentDescription = stringResource(R.string.car_image_placeholder),
         modifier = Modifier
             .width(60.dp)
             .height(60.dp),
