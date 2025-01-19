@@ -1,7 +1,6 @@
 [versions]
 coilCompose = "3.0.4"
 coilNetworkOkhttp = "3.0.4"
-converterKotlinxSerialization = "latest.version"
 hiltAndroidVersion = "2.52"
 hiltNavigationComposeVersion = "1.2.0"
 agp = "8.7.2"
@@ -11,22 +10,36 @@ kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-espressoCore = "3.6.1"
+kotlinxCoroutinesTest = "1.9.0"
 kotlinxDatetime = "0.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 lifecycleViewmodelKtx = "2.5.1"
+mockitoCore = "5.12.0"
+mockk = "1.13.5"
 moshiKotlin = "1.12.0"
 navigationFragmentKtx = "2.5.3"
 navigationCompose = "2.8.4"
+rules = "1.6.1"
 runtimeLivedata = "1.7.6"
 playServicesLocation = "21.3.0"
 playServicesMaps = "19.0.0"
 mapsCompose = "6.4.1"
-squareupConverterKotlinxSerialization = "latest.version"
+truth = "1.1.5"
+turbine = "0.12.1"
+mockitoKotlin = "5.4.0"
+junitJupiter = "5.8.1"
+navigationTesting = "2.8.5"
+junitKtx = "1.2.1"
+uiTestJunit4 = "1.7.6"
+uiTestJunit4Android = "1.7.6"
+truthVersion = "1.4.4"
+mockkAndroid = "1.13.16"
+hiltAndroidTesting = "2.55"
 
 [libraries]
+androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version = "2.11.0" }
@@ -42,7 +55,6 @@ androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx",
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -53,7 +65,10 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 squareup-javapoet = { module = "com.squareup:javapoet", version.ref = "javapoetVersion" }
@@ -61,6 +76,17 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+kotlin-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "truthVersion" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockkAndroid" }
+hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hiltAndroidTesting" }
 
 [plugins]
 hilt = { id = "com.google.dagger.hilt.android", version = "2.51.1" }
