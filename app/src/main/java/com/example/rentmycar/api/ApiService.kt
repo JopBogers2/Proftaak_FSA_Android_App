@@ -1,5 +1,6 @@
 package com.example.rentmycar.api
 
+import com.example.rentmycar.api.requests.AddTimeslotRequest
 import com.example.rentmycar.api.responses.BrandResponse
 import com.example.rentmycar.api.responses.OwnedCarResponse
 import com.example.rentmycar.api.requests.CreateReservationRequest
@@ -74,6 +75,11 @@ interface ApiService {
     @PUT("car/update")
     suspend fun updateCar(@Body request: UpdateCarRequest): Response<ResponseBody>
 
+    @DELETE("car/{id}")
+    suspend fun unregisterCar(
+        @Path("id") carId: Int
+    ): Response<MessageResponse>
+
     @GET("car/owner")
     suspend fun getOwnerCars(): Response<List<OwnedCarResponse>>
 
@@ -91,14 +97,14 @@ interface ApiService {
     @Multipart
     @POST("image/car/{id}")
     suspend fun uploadCarImage(
-    @Path("id") carId: Int,
-    @Part image: MultipartBody.Part
+        @Path("id") carId: Int,
+        @Part image: MultipartBody.Part
     ): Response<ResponseBody>
 
     @GET("image/car/{id}")
     suspend fun getImagesByCar(
         @Path("id") carId: Int,
-     ): Response<List<String>>
+    ): Response<List<String>>
 
 
     @GET("car/{id}/location")
@@ -118,18 +124,15 @@ interface ApiService {
         @Path("id") timeSlotId: Int,
     ): Response<ReservationResponse>
 
-
     @POST("/reservation/create")
     suspend fun createReservation(
         @Body request: CreateReservationRequest
     ): Response<MessageResponse>
 
-
     @DELETE("/reservation/{id}")
     suspend fun cancelReservation(
         @Path("id") reservationId: Int,
     ): Response<MessageResponse>
-
 
     @GET("timeSlot/{id}")
     suspend fun getTimeslotById(
@@ -138,6 +141,16 @@ interface ApiService {
 
     @GET("timeSlot/car/{id}")
     suspend fun getTimeslotsByCarId(
-        @Path("id") timeSlotId: Int,
+        @Path("id") carId: Int,
     ): Response<List<TimeslotResponse>>
+
+    @POST("timeSlot/create")
+    suspend fun createTimeslot(
+        @Body request: AddTimeslotRequest
+    ): Response<MessageResponse>
+
+    @DELETE("timeSlot/{id}")
+    suspend fun deleteTimeslotById(
+        @Path("id") timeSlotId: Int,
+    ): Response<MessageResponse>
 }

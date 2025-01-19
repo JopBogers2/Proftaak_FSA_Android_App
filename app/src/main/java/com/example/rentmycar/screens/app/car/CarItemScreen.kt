@@ -154,7 +154,7 @@ fun CarItemActions(car: CarResponse, context: Context, navController: NavHostCon
         // Button to reserve the car.
         Button(
             onClick = {
-                navController.navigate("timeslots/${car.id}")
+                navController.navigate("reservableTimeslots/${car.id}")
             },
             modifier = Modifier
                 .fillMaxSize()

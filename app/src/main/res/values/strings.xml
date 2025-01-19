@@ -84,4 +84,13 @@
     <string name="timeslot">Timeslot</string>
     <string name="reserve">Reserve</string>
     <string name="home">Home</string>
+    <string name="management">Management</string>
+    <string name="timeslots">Timeslots</string>
+    <string name="remove_car">Remove car</string>
+    <string name="add_timeslot">Add timeslot</string>
+    <string name="back_to_car_timeslots">Back to car timeslots</string>
+    <string name="available_from">available from</string>
+    <string name="available_until">available until</string>
+    <string name="remove">Remove</string>
+    <string name="timeslot_has_expired">Timeslot has expired</string>
 </resources>

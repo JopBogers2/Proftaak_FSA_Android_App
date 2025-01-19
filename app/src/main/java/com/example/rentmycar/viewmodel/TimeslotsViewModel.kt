@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentmycar.api.ApiCallHandler
 import com.example.rentmycar.api.ApiService
+import com.example.rentmycar.api.requests.AddTimeslotRequest
 import com.example.rentmycar.api.requests.CreateReservationRequest
 import com.example.rentmycar.api.responses.TimeslotResponse
 import com.example.rentmycar.exceptions.ApiException
@@ -12,6 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 sealed interface TimeslotsViewState {
@@ -32,7 +37,26 @@ class TimeslotsViewModel @Inject constructor(
 
     private val availableTimeslots = mutableListOf<TimeslotResponse>()
 
-    fun getAvailableCarTimeSlots(carId: Int) {
+    fun getCarTimeSlots(carId: Int) {
+        viewModelScope.launch {
+            try {
+                availableTimeslots.clear()
+                apiCallHandler.makeApiCall {
+                    apiService.getTimeslotsByCarId(carId)
+                }.forEach { timeslot -> availableTimeslots.add(timeslot) }
+
+                if (availableTimeslots.isEmpty()) {
+                    _viewState.update { TimeslotsViewState.Error("No timeslots available for car") }
+                } else {
+                    _viewState.update { TimeslotsViewState.Success(availableTimeslots) }
+                }
+            } catch (e: Exception) {
+                _viewState.update { TimeslotsViewState.Error(e.message ?: "Unknown error") }
+            }
+        }
+    }
+
+    fun getReservableCarTimeSlots(carId: Int) {
         viewModelScope.launch {
             try {
                 apiCallHandler.makeApiCall {
@@ -79,4 +103,57 @@ class TimeslotsViewModel @Inject constructor(
             }
         }
     }
+
+    fun addTimeslot(carId: Int, fromDateTime: LocalDateTime?, untilDateTime: LocalDateTime?) {
+        if (fromDateTime != null || untilDateTime != null) {
+            viewModelScope.launch {
+                try {
+                    apiCallHandler.makeApiCall {
+                        apiService.createTimeslot(
+                            AddTimeslotRequest(
+                                carId,
+                                fromDateTime!!,
+                                untilDateTime!!
+                            )
+                        )
+                    }
+
+                    _viewState.update { TimeslotsViewState.Error("Added Timeslot") }
+                } catch (e: Exception) {
+                    _viewState.update { TimeslotsViewState.Error(e.message ?: "unknown error") }
+                }
+            }
+        } else {
+            _viewState.update { TimeslotsViewState.Error("unable to parse date") }
+        }
+    }
+
+    fun removeTimeslot(timeslot: TimeslotResponse) {
+        viewModelScope.launch {
+            try {
+                _viewState.update { TimeslotsViewState.Loading }
+                apiCallHandler.makeApiCall {
+                    apiService.deleteTimeslotById(timeslot.id)
+                }.let {
+                    availableTimeslots.remove(timeslot)
+                    if (availableTimeslots.isEmpty()) {
+                        _viewState.update { TimeslotsViewState.Error("No timeslots available for car") }
+                    } else {
+                        _viewState.update { TimeslotsViewState.Success(availableTimeslots) }
+                    }
+                }
+            } catch (e: Exception) {
+                _viewState.update { TimeslotsViewState.Error(e.message ?: "Unknown error") }
+            }
+        }
+    }
+
+    companion object {
+        fun isTimeslotInPast(timeslot: TimeslotResponse) =
+            timeslot.availableFrom < Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+    }
 }
+
+
+

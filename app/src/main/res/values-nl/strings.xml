@@ -84,4 +84,13 @@
     <string name="timeslot">Tijdslot</string>
     <string name="reserve">Reserveer</string>
     <string name="home">Start</string>
+    <string name="management">Beheer</string>
+    <string name="timeslots">Tijdslot</string>
+    <string name="remove_car">Verwijder Auto</string>
+    <string name="add_timeslot">Tijdslot maken</string>
+    <string name="back_to_car_timeslots">Terug naar tijdsloten</string>
+    <string name="available_from">Beschikbaar van:</string>
+    <string name="available_until">Beschikbaar tot:</string>
+    <string name="remove">Verwijderen</string>
+    <string name="timeslot_has_expired">Tijdslot is verlopen</string>
 </resources>

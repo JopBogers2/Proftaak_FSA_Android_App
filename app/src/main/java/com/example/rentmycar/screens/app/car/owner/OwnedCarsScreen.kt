@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -19,9 +20,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -32,16 +35,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -69,7 +75,7 @@ import java.util.Locale
 fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
     var showAddCarDialog by remember { mutableStateOf(false) }
-    var refreshTrigger by remember { mutableStateOf(0) }
+    var refreshTrigger by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(refreshTrigger) {
         viewModel.getUserCars()
@@ -117,7 +123,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             is UserCarsViewState.Success -> {
                 LazyColumn {
                     items(state.cars) { car ->
-                        CarItem(car, viewModel, navController)
+                        CarItem(navController, car, viewModel)
                     }
                 }
             }
@@ -176,7 +182,7 @@ fun AddCarDialog(onDismiss: () -> Unit, onCarAdded: () -> Unit) {
 }
 
 @Composable
-fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController: NavController) {
+fun CarItem(navController: NavController, car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
     val context = LocalContext.current
     val carImages by viewModel.carImages.collectAsState()
     val carUpdateViewModel: CarUpdateViewModel = hiltViewModel()
@@ -235,13 +241,8 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
-
-            Text(
-                stringResource(R.string.no_images_available) + ": ${car.brand}",
-                style = MaterialTheme.typography.titleMedium
-            )
             Text(" ${car.model}", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -268,22 +269,43 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController:
                 Text(text = stringResource(R.string.location_not_available))
             }
 
-            Row {
-                Button(
-                    onClick = {
-                        viewModel.addCarLocation(car.id)
-                    },
-                    enabled = true
+
+            ExpandableCard(title = stringResource(R.string.management)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(stringResource(R.string.add_location))
+                    Button(
+                        onClick = {
+                            viewModel.addCarLocation(car.id)
+                        },
+                        enabled = true
+                    ) {
+                        Text(stringResource(R.string.add_location))
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(onClick = { showDialog = true }) {
+                        Text(stringResource(R.string.upload))
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = { navController.navigate("timeslotManagement/${car.id}") }) {
+                        Text(text = stringResource(R.string.timeslots))
+                    }
+
+                    Button(
+                        colors = ButtonDefaults.buttonColors().copy(
+                            containerColor = Color.Red
+                        ), onClick = { viewModel.unregisterCar(car.id) }) {
+                        Text(text = stringResource(R.string.remove_car))
+                    }
                 }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Button(onClick = { showDialog = true }) {
-                    Text(stringResource(R.string.upload))
-                }
-
             }
         }
     }
