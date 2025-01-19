@@ -50,10 +50,38 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import com.example.rentmycar.api.requests.UpdateCarRequest
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.IconButton
+import com.example.rentmycar.viewmodel.car.CarUpdateViewModel
+import com.example.rentmycar.viewmodel.car.UpdateState
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import com.example.rentmycar.viewmodel.car.owner.OwnedCarViewModel
+
+
 
 @Composable
 fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel = hiltViewModel()) {
     val viewState by viewModel.viewState.collectAsState()
+    var showAddCarDialog by remember { mutableStateOf(false) }
+    var refreshTrigger by remember { mutableStateOf(0) }
+
+      LaunchedEffect(refreshTrigger) {
+        viewModel.getUserCars()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getUserCars()
@@ -70,20 +98,14 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            // Title
+
             Text(
                 "My Cars",
                 style = MaterialTheme.typography.headlineMedium,
             )
 
-            // Button to expand the filter inputs section
-            Button(onClick = {
-                try {
-                    navController.navigate(AppNavItem.AddCar.route)
-                } catch (e: Exception) {
-                    Log.e("Navigation", "Error navigating to AddCar: ${e.message}", e)
-                }
-            }) {
+
+            Button(onClick = { showAddCarDialog = true }) {
                 Icon(
                     painter = painterResource(R.drawable.add),
                     contentDescription = "Add icon",
@@ -103,7 +125,7 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             is UserCarsViewState.Success -> {
                 LazyColumn {
                     items(state.cars) { car ->
-                        CarItem(car, viewModel)
+                        CarItem(car, viewModel, navController)
                     }
                 }
             }
@@ -124,16 +146,54 @@ fun OwnedCarsScreen(navController: NavController, viewModel: OwnedCarsViewModel 
             }
         }
     }
+    if (showAddCarDialog) {
+        AddCarDialog(
+            onDismiss = { showAddCarDialog = false },
+            onCarAdded = {
+                showAddCarDialog = false
+                refreshTrigger++
+            }
+        )
+    }
+}
+
+
+@Composable
+fun AddCarDialog(onDismiss: () -> Unit, onCarAdded: () -> Unit) {
+    val addCarViewModel: OwnedCarViewModel = hiltViewModel()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add New Car") },
+        text = {
+            AddCarScreen(
+                viewModel = addCarViewModel,
+                onCarAdded = {
+                    onCarAdded()
+                    onDismiss()
+                }
+            )
+        },
+        confirmButton = {},
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable
-fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
+fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel, navController: NavController) {
     val context = LocalContext.current
     val carImages by viewModel.carImages.collectAsState()
+    val carUpdateViewModel: CarUpdateViewModel = hiltViewModel()
 
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
     var showDialog by remember { mutableStateOf(false) }
     var isUploading by remember { mutableStateOf(false) }
+
+
 
     LaunchedEffect(car.id) {
         viewModel.getImagesByCar(car.id)
@@ -171,6 +231,8 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
             }
         }
 
+
+
     OutlinedCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -183,7 +245,9 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            Text("Model: ${car.model}", style = MaterialTheme.typography.titleMedium)
+
+              Text("Brand: ${car.brand}", style = MaterialTheme.typography.titleMedium)
+            Text(" ${car.model}", style = MaterialTheme.typography.titleMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -200,7 +264,8 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            CarInfo(car)
+
+          CarInfo(car, carUpdateViewModel)
 
             if (car.locationId != null) {
                 Text(text = "Location ID: ${car.locationId}")
@@ -224,6 +289,7 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
                 Button(onClick = { showDialog = true }) {
                     Text("Upload")
                 }
+
             }
         }
     }
@@ -261,16 +327,222 @@ fun CarItem(car: OwnedCarResponse, viewModel: OwnedCarsViewModel) {
             }
         )
     }
+
+}
+
+
+
+@Composable
+fun CarInfo(car: OwnedCarResponse, carUpdateViewModel: CarUpdateViewModel = hiltViewModel()) {
+    var editingField by remember { mutableStateOf<String?>(null) }
+    var editedCar by remember(car) { mutableStateOf(car) }
+
+    val updateState by carUpdateViewModel.updateState.collectAsState()
+    val carDetailsMap by carUpdateViewModel.carDetailsMap.collectAsState()
+
+    LaunchedEffect(car.id) {
+        carUpdateViewModel.getCarDetails(car.id)
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        val currentCar = carDetailsMap[car.id] ?: car
+
+
+        Text("Category: ${currentCar.category}",
+             style = MaterialTheme.typography.bodyMedium,
+             modifier = Modifier.padding(vertical = 4.dp))
+
+        EditableDropdownField(
+            label = "Fuel",
+            value = currentCar.fuel,
+            options = listOf("DIESEL", "PETROL", "GAS", "ELECTRIC", "HYDROGEN"),
+            isEditing = editingField == "fuel"
+        ) { newValue ->
+            editedCar = editedCar.copy(fuel = newValue)
+            editingField = null
+            carUpdateViewModel.updateCar(editedCar)
+        }
+        EditableDropdownField(
+            label = "Transmission",
+            value = currentCar.transmission,
+            options = listOf("AUTOMATIC", "MANUAL"),
+            isEditing = editingField == "transmission"
+        ) { newValue ->
+            editedCar = editedCar.copy(transmission = newValue)
+            editingField = null
+            carUpdateViewModel.updateCar(editedCar)
+        }
+        EditableField("Color", currentCar.color, editingField == "color") { newValue ->
+            editedCar = editedCar.copy(color = newValue)
+            editingField = null
+            carUpdateViewModel.updateCar(editedCar)
+        }
+
+            EditableField("Price", currentCar.price.toString(), editingField == "price") { newValue ->
+            val newPrice = newValue.toDoubleOrNull()
+            if (newPrice != null) {
+                editedCar = editedCar.copy(price = newPrice)
+                editingField = null
+                carUpdateViewModel.updateCar(editedCar)
+               }
+           }
+
+           EditableField("Year", currentCar.year.toString(), editingField == "year") { newValue ->
+            val newYear = newValue.toIntOrNull()
+            if (newYear != null) {
+                editedCar = editedCar.copy(year = newYear)
+                editingField = null
+                carUpdateViewModel.updateCar(editedCar)
+            }
+        }
+
+        Text("License plate: ${currentCar.licensePlate}",
+             style = MaterialTheme.typography.bodyMedium,
+             modifier = Modifier.padding(vertical = 4.dp))
+
+        when (updateState) {
+            is UpdateState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+            }
+            is UpdateState.Success -> {
+                Text(
+                    text = (updateState as UpdateState.Success).message,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+            is UpdateState.Error -> {
+                val errorState = updateState as UpdateState.Error
+                Text(
+                    text = "Error: ${errorState.message}",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(8.dp)
+                )
+                errorState.fieldErrors.forEach { (field, error) ->
+                    Text(
+                        text = "$field: $error",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                    )
+                }
+            }
+            else -> {}
+        }
+    }
 }
 
 @Composable
-fun CarInfo(car: OwnedCarResponse) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        SpecificationRow("Model", car.model)
-        SpecificationRow("Category", car.category)
-        SpecificationRow("Fuel", car.fuel)
-        SpecificationRow("Transmission", car.transmission)
-        SpecificationRow("Color", car.color)
-        SpecificationRow("License plate", car.licensePlate)
+fun EditableField(
+    label: String,
+    value: String,
+    isEditing: Boolean,
+    onValueChange: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(value) }
+    var editing by remember { mutableStateOf(isEditing) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (editing) {
+            TextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text(label) },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        editing = false
+                        onValueChange(text)
+                    }
+                )
+            )
+            Button(onClick = {
+                editing = false
+                onValueChange(text)
+            }) {
+                Text("Save")
+            }
+        } else {
+            Text(
+                text = "$label: $value",
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { editing = true }
+            )
+            IconButton(onClick = { editing = true }) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit")
+            }
+        }
+    }
+}
+
+@Composable
+fun EditableDropdownField(
+    label: String,
+    value: String,
+    options: List<String>,
+    isEditing: Boolean,
+    onValueChange: (String) -> Unit
+) {
+    var editing by remember { mutableStateOf(isEditing) }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(value) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (editing) {
+            Box(modifier = Modifier.weight(1f)) {
+                OutlinedButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(selectedOption)
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    options.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                selectedOption = option
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            Button(onClick = {
+                editing = false
+                onValueChange(selectedOption)
+            }) {
+                Text("Save")
+            }
+        } else {
+            Text(
+                text = "$label: $value",
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { editing = true }
+            )
+            IconButton(onClick = { editing = true }) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit")
+            }
+        }
     }
 }
